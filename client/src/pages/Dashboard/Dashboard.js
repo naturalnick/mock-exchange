@@ -1,3 +1,8 @@
 export default function Dashboard() {
-	return <div>Dashboard</div>;
+	return (
+		<div>
+			<h2>Dashboard</h2>
+			<div>Authenticated as</div>
+		</div>
+	);
 }
