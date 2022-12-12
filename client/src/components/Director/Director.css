@@ -4,3 +4,16 @@
 	color: #8f9193;
 	margin-top: 6px;
 }
+
+body {
+	background-color: #0f3460;
+	color: #d8e9a8;
+}
+
+.navbar {
+	margin-bottom: 5%;
+}
+
+.page {
+	max-width: 1000px;
+}

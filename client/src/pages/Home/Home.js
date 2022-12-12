@@ -1,18 +1,17 @@
-import Container from "react-bootstrap/Container";
-import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import { useAuth } from "../../context/AuthProvider";
+import Login from "../../components/Login/Login";
+import Hero from "../../components/Hero/Hero";
 
 export default function Home() {
-	const { onLogin } = useAuth();
 	return (
-		<Container>
-			<Row>
-				<Col md={6}>Hero</Col>
-				<Col md={6}>Login</Col>
-			</Row>
-			<Button onClick={onLogin}>Login</Button>
-		</Container>
+		<Row>
+			<Col md={8}>
+				<Hero />
+			</Col>
+			<Col md={4}>
+				<Login />
+			</Col>
+		</Row>
 	);
 }

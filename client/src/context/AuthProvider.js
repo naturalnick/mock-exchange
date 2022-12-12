@@ -18,7 +18,7 @@ export const AuthProvider = ({ children }) => {
 
 		setToken(token);
 
-		navigate(origin);
+		navigate("/dashboard");
 	};
 
 	const handleLogout = () => {
