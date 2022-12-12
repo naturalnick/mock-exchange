@@ -26,11 +26,14 @@ export default function Director() {
 										Dashboard
 									</Link>
 									<Link to="/trading" className="d-nav-item">
-										Trading
+										Trade
 									</Link>
-									<Button onClick={onLogout} className="">
+									<Link
+										onClick={onLogout}
+										className="d-nav-item logout"
+									>
 										Log Out
-									</Button>
+									</Link>
 								</>
 							) : (
 								<Link to="/" className="d-nav-item">

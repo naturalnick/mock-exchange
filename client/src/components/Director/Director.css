@@ -1,8 +1,8 @@
 .d-nav-item {
-	margin-right: 20px;
+	margin-left: 30px;
 	text-decoration: none;
 	color: #8f9193;
-	margin-top: 6px;
+	margin-top: 4px;
 }
 
 body {
@@ -16,4 +16,8 @@ body {
 
 .page {
 	max-width: 1000px;
+}
+
+.logout {
+	color: red;
 }
