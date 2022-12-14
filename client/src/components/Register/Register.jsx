@@ -5,7 +5,7 @@ import { useAuth } from "../../context/AuthProvider";
 import "./Register.css";
 
 export default function Register() {
-	const { onLogin } = useAuth();
+	const { onRegister } = useAuth();
 	return (
 		<Card className="login-card">
 			<Card.Body>
@@ -31,7 +31,7 @@ export default function Register() {
 							placeholder="Re-Type Password"
 						/>
 					</Form.Group>
-					<Button variant="primary" onClick={onLogin}>
+					<Button variant="primary" onClick={onRegister}>
 						Sign Up
 					</Button>
 				</Form>

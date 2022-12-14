@@ -1,10 +1,6 @@
 import { useState, createContext, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-
-const fakeAuth = () =>
-	new Promise((resolve) => {
-		setTimeout(() => resolve("2342f2f1d131rf12"), 250);
-	});
+import axios from "axios";
 
 const AuthContext = createContext(null);
 
@@ -13,21 +9,39 @@ export const AuthProvider = ({ children }) => {
 
 	const [token, setToken] = useState(null);
 
-	const handleLogin = async () => {
-		const token = await fakeAuth();
+	async function handleLogin() {
+		const response = await axios.post("http://127.0.0.1:5000/login", {
+			email: "nick@nick.com",
+			password: "password",
+		});
 
-		setToken(token);
+		setToken(response.data.token);
+		//save token in as cookie
 
 		navigate("/dashboard");
-	};
+	}
 
-	const handleLogout = () => {
+	function handleLogout() {
 		setToken(null);
-	};
+	}
+
+	async function handleRegister() {
+		const response = await axios.post("http://127.0.0.1:5000/register", {
+			email: "nick@nick.com",
+			password: "password",
+		});
+		console.log(response);
+		handleLogin();
+	}
 
 	return (
 		<AuthContext.Provider
-			value={{ token, onLogin: handleLogin, onLogout: handleLogout }}
+			value={{
+				token,
+				onLogin: handleLogin,
+				onLogout: handleLogout,
+				onRegister: handleRegister,
+			}}
 		>
 			{children}
 		</AuthContext.Provider>
@@ -39,6 +53,12 @@ export const useAuth = () => {
 		token,
 		onLogin: handleLogin,
 		onLogout: handleLogout,
+		onRegister: handleRegister,
 	} = useContext(AuthContext);
-	return { token, onLogin: handleLogin, onLogout: handleLogout };
+	return {
+		token,
+		onLogin: handleLogin,
+		onLogout: handleLogout,
+		onRegister: handleRegister,
+	};
 };
