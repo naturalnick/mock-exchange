@@ -1,0 +1,21 @@
+.stock-card {
+	background-color: white;
+	padding: 20px;
+	color: black;
+}
+
+.stock-header {
+	font-size: 18pt;
+}
+
+.stock-footer {
+	font-size: 10pt;
+}
+
+.trade-btn {
+	margin-top: -10px;
+}
+.closed {
+	font-size: 10pt;
+	margin-bottom: 20px;
+}

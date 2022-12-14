@@ -10,7 +10,7 @@ export const AuthProvider = ({ children }) => {
 	const [token, setToken] = useState(null);
 
 	async function handleLogin() {
-		const response = await axios.post("http://127.0.0.1:5000/login", {
+		const response = await axios.post("http://127.0.0.1:5001/login", {
 			email: "nick@nick.com",
 			password: "password",
 		});
@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }) => {
 	}
 
 	async function handleRegister() {
-		const response = await axios.post("http://127.0.0.1:5000/register", {
+		const response = await axios.post("http://127.0.0.1:5001/register", {
 			email: "nick@nick.com",
 			password: "password",
 		});

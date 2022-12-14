@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from database import db
 from models import Account
 from helpers import generate_account_id, generate_token
+import iex
 
 load_dotenv()
 
@@ -66,6 +67,12 @@ def register_user():
 	return {"token": generate_token(email)}, 200
 
 
+@app.route("/api/stock", methods=["GET"])
+def get_stock():
+	stock_symbol = request.args.get("symbol")
+	data = iex.get_stock_data(stock_symbol)
+	return data, 200
+
 def create_account(email, password):
 	while(True):
 		account_id = generate_account_id()
@@ -93,4 +100,4 @@ def check_account_number_exists(id):
 
 
 if __name__ == "__main__":
-	app.run(debug=True)
+	app.run(debug=True,port=5001)
