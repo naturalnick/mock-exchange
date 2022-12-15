@@ -7,7 +7,7 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import Trade from "./pages/Trade/Trade";
 import NotFound from "./pages/NotFound/NotFound";
 import { AuthProvider } from "./context/AuthProvider";
-import ProtectedRoute from "./ProtectedRoute";
+import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 
 function App() {
 	return (
