@@ -14,10 +14,6 @@ body {
 	margin-bottom: 5%;
 }
 
-.page {
-	max-width: 1000px;
-}
-
 .logout {
 	color: red;
 }

@@ -29,7 +29,7 @@ export default function SearchBar({ handleSearch }) {
 					id="button"
 					onClick={() => handleSearch(input)}
 				>
-					Button
+					Search
 				</Button>
 			</InputGroup>
 		</>
