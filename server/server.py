@@ -25,7 +25,6 @@ with app.app_context():
 
 @app.route("/")
 def index():
-	create_account()
 	return "Hello"
 
 #### use this once we start hosting on server
