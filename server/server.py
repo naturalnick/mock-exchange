@@ -77,7 +77,7 @@ def create_account(email, password):
 		account_id = generate_account_id()
 		if check_account_number_exists(account_id) == False: break
 	#encrypt password
-	newAccount = Account(account_number=account_id, email=email, password=password, balance=1000)
+	newAccount = Account(id=account_id, email=email, password=password, balance=1000)
 	db.session.add(newAccount)
 	db.session.commit()
 

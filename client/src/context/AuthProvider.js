@@ -1,37 +1,40 @@
 import { useState, createContext, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useCookies } from "react-cookie";
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
 	const navigate = useNavigate();
 
-	const [token, setToken] = useState(null);
+	const [cookies, setCookie, removeCookie] = useCookies(["token"]);
+	const [token, setToken] = useState(() => cookies.token);
 
-	async function handleLogin() {
+	async function handleLogin(email, password) {
 		const response = await axios.post("http://127.0.0.1:5001/login", {
-			email: "nick@nick.com",
-			password: "password",
+			email: email,
+			password: password,
 		});
-
+		console.log(response);
 		setToken(response.data.token);
-		//save token in as cookie
+		setCookie("token", response.data.token, { path: "/" });
 
 		navigate("/dashboard");
 	}
 
 	function handleLogout() {
 		setToken(null);
+		removeCookie("token");
 	}
 
-	async function handleRegister() {
+	async function handleRegister(email, password) {
 		const response = await axios.post("http://127.0.0.1:5001/register", {
-			email: "nick@nick.com",
-			password: "password",
+			email: email,
+			password: password,
 		});
 		console.log(response);
-		handleLogin();
+		handleLogin(email, password);
 	}
 
 	return (

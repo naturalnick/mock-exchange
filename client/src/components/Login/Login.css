@@ -7,3 +7,11 @@
 	font-size: 20pt;
 	margin-bottom: 20px;
 }
+
+.type-link {
+	color: blue;
+}
+
+.type-text {
+	text-align: center;
+}
