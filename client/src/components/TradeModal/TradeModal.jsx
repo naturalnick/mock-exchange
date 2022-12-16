@@ -1,10 +1,10 @@
+import { useState, useEffect } from "react";
 import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Select from "react-select";
+import { useAccount } from "../../context/AccountProvider";
 import "./TradeModal.css";
-import { useState } from "react";
-import { useEffect } from "react";
 
 export default function TradeModal({
 	handleClose,
@@ -12,6 +12,8 @@ export default function TradeModal({
 	symbol,
 	askPrice,
 }) {
+	const { cashBalance, holdings } = useAccount();
+
 	const [action, setAction] = useState("");
 	const [quantity, setQuantity] = useState(0);
 	const [total, setTotal] = useState(0);
@@ -25,6 +27,15 @@ export default function TradeModal({
 		{ value: "sell", label: "Sell" },
 	];
 
+	function getCurrentHoldings() {
+		for (let i = 0; i < holdings.length; i++) {
+			if (holdings[i].symbol === symbol) {
+				return holdings[i].shares;
+			}
+		}
+		return 0;
+	}
+
 	function handleSubmit() {
 		//process data
 		handleClose();
@@ -36,8 +47,6 @@ export default function TradeModal({
 				<Modal.Title>Trade: {symbol}</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
-				<div>Available funds: $100</div>
-				<div>Shares of {symbol} owned: 2</div>
 				<span className="trade-price">${askPrice}</span> / share
 				<Form.Group className="mb-3" controlId="action">
 					<Form.Label>Action</Form.Label>
@@ -54,6 +63,10 @@ export default function TradeModal({
 					/>
 				</Form.Group>
 				Total: <span className="trade-price">${total}</span>
+				<div className="trade-extra">
+					<div>Available funds: ${cashBalance}</div>
+					<div>Shares currently owned: {getCurrentHoldings()}</div>
+				</div>
 			</Modal.Body>
 			<Modal.Footer>
 				<Button variant="secondary" onClick={handleClose}>

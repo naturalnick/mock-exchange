@@ -5,7 +5,7 @@ import { useCookies } from "react-cookie";
 
 const AuthContext = createContext(null);
 
-export const AuthProvider = ({ children }) => {
+export function AuthProvider({ children }) {
 	const navigate = useNavigate();
 
 	const [cookies, setCookie, removeCookie] = useCookies(["token"]);
@@ -49,9 +49,9 @@ export const AuthProvider = ({ children }) => {
 			{children}
 		</AuthContext.Provider>
 	);
-};
+}
 
-export const useAuth = () => {
+export function useAuth() {
 	const {
 		token,
 		onLogin: handleLogin,
@@ -64,4 +64,4 @@ export const useAuth = () => {
 		onLogout: handleLogout,
 		onRegister: handleRegister,
 	};
-};
+}

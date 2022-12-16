@@ -11,9 +11,15 @@ def generate_account_id():
 		account_number += str(random.randrange(0, 10))
 	return account_number
 
+
 def generate_token(email):
 	return jwt.encode({"email": email}, os.getenv("JWT_SECRET"), algorithm="HS256")
 
-def check_jwt(token):
-	decoded = jwt.decode(token, os.getenv("JWT_SECRET"), algorithms="HS256")
-	return True if decoded else False
+
+def decode_token(token):
+	try:
+		decoded = jwt.decode(token, os.getenv("JWT_SECRET"), algorithms="HS256")
+	except:
+		return None
+	else:
+		return decoded
