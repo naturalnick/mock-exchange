@@ -3,7 +3,7 @@ import "./Holdings.css";
 
 export default function Holdings() {
 	return (
-		<Table striped bordered hover>
+		<Table striped hover>
 			<thead>
 				<tr>
 					<th>Symbol</th>

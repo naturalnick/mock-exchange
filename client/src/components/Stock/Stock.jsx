@@ -38,7 +38,7 @@ export default function Stock({
 						{companyName} ({symbol}){" "}
 					</span>
 					<Button
-						disabled={!isUSMarketOpen}
+						disabled={isUSMarketOpen}
 						size="sm"
 						className="trade-btn"
 						variant="success"

@@ -3,8 +3,8 @@ from flask_cors import CORS
 import os
 from dotenv import load_dotenv
 from database import db
-from models import Account
-from helpers import generate_account_id, generate_token
+from models import Account, Holdings, Transactions
+from helpers import generate_account_id, generate_token, decode_token
 import iex
 
 load_dotenv()
@@ -25,30 +25,21 @@ with app.app_context():
 
 @app.route("/")
 def index():
+	print(get_account_holdings(66245866))
 	return "Hello"
 
-#### use this once we start hosting on server
-# @app.route("/")
-# def index():
-# 	return app.send_static_file("index.html"), 200
 
-
-# @app.errorhandler(404)
-# def not_found(e):
-# 	return app.send_static_file("index.html"), 200
-
-
-@app.route("/login", methods=["GET", "POST"])
+@app.route("/login", methods=["POST"])
 def login_user():
-	if request.method == "POST":
-		email = request.json["email"]
-		password = request.json["password"]
+	email = request.json["email"]
+	password = request.json["password"]
 
-		if check_email_exists(email) is False:
-			return "Account does not exist for that email.", 404
+	if check_email_exists(email) is False:
+		return "Account does not exist for that email.", 404
 
-		if validate_credentials(email, password) is False:
-			return "Incorrect password.", 401
+	account = get_account(email)
+	if password != account.password:
+		return "Incorrect password.", 401
 
 	return {"token": generate_token(email)}, 200
 
@@ -72,6 +63,54 @@ def get_stock():
 	data = iex.get_stock_data(stock_symbol)
 	return data, 200
 
+
+@app.route("/api/account/info", methods=["GET"])
+def account_info():
+	token = decode_token(request.args.get("token"))
+	if token is None: return {"Error": "invalid token"}, 401
+
+	account = get_account(token["email"])
+	return {"account_number": account.id, "balance": account.balance}, 200
+
+
+@app.route("/api/account/holdings", methods=["GET"])
+def account_holdings():
+	token = request.args.get("token")
+	email = decode_token(token)["email"]
+
+	if decode_token(token) is None: return {"Error": "invalid token"}, 401
+
+	account = get_account(email)
+	holdings = get_account_holdings(account.id)
+
+	return {"holdings": holdings}, 200
+
+
+@app.route("/api/account/transactions", methods=["GET"])
+def account_transactions():
+	token = request.args.get("token")
+	email = decode_token(token)["email"]
+
+	if decode_token(token) is None: return {"Error": "invalid token"}, 401
+
+	account = get_account(email)
+	transactions = get_account_transactions(account.id)
+
+	return {"transactions": transactions}, 200
+
+
+@app.route("/api/trade", methods=["GET"])
+def trade():
+	token = request.args.get("token")
+	email = decode_token(token)["email"]
+	action = request.args.get("action")
+	quantity = request.args.get("quantity")
+
+	if decode_token(token) is None: return {"Error": "invalid token"}, 401
+
+	account = get_account(email)
+
+
 def create_account(email, password):
 	while(True):
 		account_id = generate_account_id()
@@ -82,20 +121,25 @@ def create_account(email, password):
 	db.session.commit()
 
 
-def validate_credentials(email, password):
-	account = Account.query.filter_by(email=email).first()
-	if account is not None and account.password == password:
-		return True
-	else: return False
-
-
 def check_email_exists(email):
-	account = Account.query.filter_by(email=email).first()
+	account = db.session.query(Account).filter(Account.email == email).first()
 	return False if account is None else True
+
+
+def get_account(email):
+	return db.session.query(Account).filter(Account.email == email).first()
 
 
 def check_account_number_exists(id):
 	return False if db.session.get(Account, id) is None else True
+
+
+def get_account_holdings(account_number):
+	return db.session.query(Holdings).filter(Holdings.account_number == account_number).all()
+
+
+def get_account_transactions(account_number):
+	return db.session.query(Transactions).filter(Transactions.account_number == account_number).all()
 
 
 if __name__ == "__main__":
