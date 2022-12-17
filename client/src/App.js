@@ -14,38 +14,42 @@ import Account from "./pages/Account/Account";
 function App() {
 	return (
 		<AuthProvider>
-			<AccountProvider>
-				<Routes>
-					<Route path="/" element={<Director />}>
-						<Route index element={<Home />} />
-						<Route
-							path="Dashboard"
-							element={
-								<ProtectedRoute>
+			<Routes>
+				<Route path="/" element={<Director />}>
+					<Route index element={<Home />} />
+					<Route
+						path="Dashboard"
+						element={
+							<ProtectedRoute>
+								<AccountProvider>
 									<Dashboard />
-								</ProtectedRoute>
-							}
-						/>
-						<Route
-							path="Trading"
-							element={
-								<ProtectedRoute>
+								</AccountProvider>
+							</ProtectedRoute>
+						}
+					/>
+					<Route
+						path="Trading"
+						element={
+							<ProtectedRoute>
+								<AccountProvider>
 									<Trade />
-								</ProtectedRoute>
-							}
-						/>
-						<Route
-							path="Account"
-							element={
-								<ProtectedRoute>
+								</AccountProvider>
+							</ProtectedRoute>
+						}
+					/>
+					<Route
+						path="Account"
+						element={
+							<ProtectedRoute>
+								<AccountProvider>
 									<Account />
-								</ProtectedRoute>
-							}
-						/>
-						<Route path="*" element={<NotFound />} />
-					</Route>
-				</Routes>
-			</AccountProvider>
+								</AccountProvider>
+							</ProtectedRoute>
+						}
+					/>
+					<Route path="*" element={<NotFound />} />
+				</Route>
+			</Routes>
 		</AuthProvider>
 	);
 }
