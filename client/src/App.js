@@ -9,6 +9,7 @@ import NotFound from "./pages/NotFound/NotFound";
 import { AuthProvider } from "./context/AuthProvider";
 import { AccountProvider } from "./context/AccountProvider";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
+import Account from "./pages/Account/Account";
 
 function App() {
 	return (
@@ -30,6 +31,14 @@ function App() {
 							element={
 								<ProtectedRoute>
 									<Trade />
+								</ProtectedRoute>
+							}
+						/>
+						<Route
+							path="Account"
+							element={
+								<ProtectedRoute>
+									<Account />
 								</ProtectedRoute>
 							}
 						/>

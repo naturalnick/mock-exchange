@@ -1,6 +1,8 @@
 from flask import Flask, request
 from flask_cors import CORS
 import os
+from datetime import datetime
+import pytz
 from dotenv import load_dotenv
 from database import db
 from models import Account, Holdings, Transactions
@@ -44,16 +46,15 @@ def login_user():
 	return {"token": generate_token(email)}, 200
 
 
-@app.route("/register", methods=["GET", "POST"])
+@app.route("/register", methods=["POST"])
 def register_user():
-	if request.method == "POST":
-		email = request.json["email"]
-		password = request.json["password"]
+	email = request.json["email"]
+	password = request.json["password"]
 
-		if check_email_exists(email) is True:
-			return "This email already has an account.", 403
+	if check_email_exists(email) is True:
+		return "This email already has an account.", 403
 
-		create_account(email, password)
+	create_account(email, password)
 	return {"token": generate_token(email)}, 200
 
 
@@ -99,16 +100,53 @@ def account_transactions():
 	return {"transactions": transactions}, 200
 
 
-@app.route("/api/trade", methods=["GET"])
+@app.route("/api/trade", methods=["POST"])
 def trade():
-	token = request.args.get("token")
-	email = decode_token(token)["email"]
-	action = request.args.get("action")
-	quantity = request.args.get("quantity")
+	transaction = request.json
 
-	if decode_token(token) is None: return {"Error": "invalid token"}, 401
+	token = transaction.pop("token")
+	email = decode_token(token)["email"]
+	if email is None: return {"Error": "invalid token"}, 401
 
 	account = get_account(email)
+	transaction.update({"account_number": account.id})
+
+	transaction_amount = float(transaction["quantity"]) * float(transaction["cost_per_share"])
+
+	adjustBalance(account.id, account.balance, transaction_amount)
+	modifyHoldings(**transaction)
+	logTransaction(**transaction)
+	return "Ok", 200
+
+
+def adjustBalance(account_number, balance, amount):
+	db.session.query(Account).filter(Account.id == account_number).update({"balance": balance - amount})
+	db.session.commit()
+	
+
+def modifyHoldings(account_number, symbol, quantity, cost_per_share):
+	holding = db.session.query(Holdings).filter(Holdings.account_number == account_number and Holdings.symbol == symbol).one()
+	if holding is None:
+		newHolding = Holdings(account_number=account_number, symbol=symbol, shares=quantity, base_cost=cost_per_share)
+		db.session.add(newHolding)
+	else:
+		new_quantity = holding.shares + float(quantity)
+
+		if int(quantity) > 0:
+			new_price = (holding.base_cost + cost_per_share) / 2
+		else:
+			new_price = holding.base_cost
+
+		db.session.query(Holdings).filter(Holdings.account_number == account_number and Holdings.symbol == symbol).update({"shares": new_quantity, "base_cost": new_price})
+
+	db.session.commit()
+
+
+def logTransaction(account_number, symbol, quantity, cost_per_share):
+	date = datetime.now().astimezone(pytz.utc)
+	newTransaction = Transactions(account_number=account_number, date=date, symbol=symbol, shares=quantity, price=cost_per_share)
+	db.session.add(newTransaction)
+	db.session.commit()
 
 
 def create_account(email, password):
@@ -135,11 +173,19 @@ def check_account_number_exists(id):
 
 
 def get_account_holdings(account_number):
-	return db.session.query(Holdings).filter(Holdings.account_number == account_number).all()
+	entries = db.session.query(Holdings).filter(Holdings.account_number == account_number).all()
+	holdings = []
+	for entry in entries:
+		holdings.append({"id": entry.id, "symbol": entry.symbol, "quantity": entry.shares, "base_cost":entry.base_cost})
+	return holdings
 
 
 def get_account_transactions(account_number):
-	return db.session.query(Transactions).filter(Transactions.account_number == account_number).all()
+	entries = db.session.query(Transactions).filter(Transactions.account_number == account_number).all()
+	transactions = []
+	for entry in entries:
+		transactions.append({"id": entry.id, "date": entry.date, "symbol": entry.symbol, "quantity": entry.shares, "price":entry.price})
+	return transactions
 
 
 if __name__ == "__main__":
