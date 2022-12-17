@@ -11,12 +11,12 @@ function AccountProvider({ children }) {
 	const [holdings, setHoldings] = useState([]);
 
 	useEffect(() => {
-		getAccountInfo();
-		getAccountHoldings();
+		updateAccountInfo();
+		updateAccountHoldings();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
-	async function getAccountInfo() {
+	async function updateAccountInfo() {
 		const response = await axios.get(
 			`http://127.0.0.1:5001/api/account/info?token=${token}`
 		);
@@ -25,16 +25,40 @@ function AccountProvider({ children }) {
 		setCashBalance(accountInfo.balance);
 	}
 
-	async function getAccountHoldings() {
+	async function updateAccountHoldings() {
 		const response = await axios.get(
 			`http://127.0.0.1:5001/api/account/holdings?token=${token}`
 		);
-		const accountHoldings = response.data;
-		setHoldings(accountHoldings);
+		const holdings = response.data.holdings;
+		for (let i = 0; i < holdings.length; i++) {
+			const stockData = await getStockData(holdings[i].symbol);
+
+			holdings[i].marketValue =
+				stockData.askPrice === 0
+					? stockData.closePrice
+					: stockData.askPrice;
+			holdings[i].companyName = stockData.companyName;
+		}
+		setHoldings(response.data.holdings);
+	}
+
+	async function getStockData(symbol) {
+		const response = await axios.get(
+			`http://127.0.0.1:5001/api/stock?symbol=${symbol}`
+		);
+		return response.data;
 	}
 
 	return (
-		<AccountContext.Provider value={{ accountNumber, cashBalance, holdings }}>
+		<AccountContext.Provider
+			value={{
+				accountNumber,
+				cashBalance,
+				holdings,
+				updateAccountInfo,
+				updateAccountHoldings,
+			}}
+		>
 			{children}
 		</AccountContext.Provider>
 	);

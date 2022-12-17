@@ -25,8 +25,8 @@ export default function Trade() {
 				{displayStocks()}
 			</div>
 			<div>
-				<h2>Watchlist</h2>
-				{displayStocks()}
+				{/* <h2>Watchlist</h2>
+				{displayStocks()} */}
 			</div>
 		</div>
 	);

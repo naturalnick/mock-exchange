@@ -66,18 +66,21 @@ export default function Stock({
 				<Col>
 					<div className="stock-stat-header">Todays's Change</div>
 					<div className="stock-stat">
-						{change} ({changePercent}%)
+						{change} ({Number(changePercent) * 100}%)
 					</div>
 				</Col>
 				<Col>
 					<div className="stock-stat-header">Bid Price</div>
-					<div className="stock-stat">{bidPrice}</div>
+					<div className="stock-stat">
+						{bidPrice !== 0 ? bidPrice : "-"}
+					</div>
 				</Col>
 				<Col>
 					<div className="stock-stat-header">Ask Price</div>
-					<div className="stock-stat">{askPrice}</div>
+					<div className="stock-stat">
+						{askPrice !== 0 ? askPrice : "-"}
+					</div>
 				</Col>
-				<hr />
 			</Row>
 			<Row className="mb-2">
 				<Col>
@@ -114,7 +117,7 @@ export default function Stock({
 				handleClose={handleClose}
 				showTradeModal={showTradeModal}
 				symbol={symbol}
-				askPrice={askPrice}
+				price={askPrice !== 0 ? askPrice : closePrice} // change later
 			/>
 		</div>
 	);

@@ -4,10 +4,15 @@
 
 .trade-price {
 	font-size: 20pt;
+	margin-bottom: 40px;
 }
 
 .trade-extra {
 	margin-top: 10px;
 	background-color: #e6e8eb;
 	padding: 10px;
+}
+
+.stack-form {
+	margin-top: 10px;
 }

@@ -27,6 +27,9 @@ export default function Director() {
 									<Link to="/trading" className="d-nav-item">
 										Trade
 									</Link>
+									<Link to="/account" className="d-nav-item">
+										Account
+									</Link>
 									<Link
 										onClick={onLogout}
 										className="d-nav-item logout"
