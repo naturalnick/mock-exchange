@@ -37,11 +37,11 @@ def login_user():
 	password = request.json["password"]
 
 	if check_email_exists(email) is False:
-		return "Account does not exist for that email.", 404
+		return {"error": "Account does not exist for that email."}, 404
 
 	account = get_account(email)
 	if password != account.password:
-		return "Incorrect password.", 401
+		return {"error": "Incorrect password."}, 401
 
 	return {"token": generate_token(email)}, 200
 
@@ -52,7 +52,7 @@ def register_user():
 	password = request.json["password"]
 
 	if check_email_exists(email) is True:
-		return "This email already has an account.", 403
+		return {"error":"This email already has an account."}, 403
 
 	create_account(email, password)
 	return {"token": generate_token(email)}, 200
@@ -68,7 +68,7 @@ def get_stock():
 @app.route("/api/account/info", methods=["GET"])
 def account_info():
 	token = decode_token(request.args.get("token"))
-	if token is None: return {"Error": "invalid token"}, 401
+	if token is None: return {"error": "invalid token"}, 401
 
 	account = get_account(token["email"])
 	return {"account_number": account.id, "balance": account.balance}, 200

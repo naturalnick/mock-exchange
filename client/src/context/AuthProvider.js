@@ -10,17 +10,28 @@ export function AuthProvider({ children }) {
 
 	const [cookies, setCookie, removeCookie] = useCookies(["token"]);
 	const [token, setToken] = useState(() => cookies.token);
+	const [authError, setAuthError] = useState("");
 
 	async function handleLogin(email, password) {
-		const response = await axios.post("http://127.0.0.1:5001/login", {
-			email: email,
-			password: password,
-		});
-		console.log(response);
-		setToken(response.data.token);
-		setCookie("token", response.data.token, { path: "/" });
+		const response = await axios
+			.post("http://127.0.0.1:5001/login", {
+				email: email,
+				password: password,
+			})
+			.catch((error) => {
+				if (error.message === "Network Error") {
+					setAuthError("Server connection failed.");
+				} else {
+					setAuthError(error.response.data.error);
+				}
+			});
 
-		navigate("/dashboard");
+		if (response && response.status === 200) {
+			setToken(response.data.token);
+			setCookie("token", response.data.token, { path: "/" });
+
+			navigate("/dashboard");
+		}
 	}
 
 	function handleLogout() {
@@ -28,13 +39,23 @@ export function AuthProvider({ children }) {
 		removeCookie("token");
 	}
 
-	async function handleRegister(email, password) {
-		const response = await axios.post("http://127.0.0.1:5001/register", {
-			email: email,
-			password: password,
-		});
-		console.log(response);
-		handleLogin(email, password);
+	async function handleRegister(formData) {
+		console.log(formData);
+		const response = await axios
+			.post("http://127.0.0.1:5001/register", {
+				email: formData.email,
+				password: formData.password,
+			})
+			.catch((error) => {
+				if (error.message === "Network Error") {
+					setAuthError("Server connection failed.");
+				} else {
+					setAuthError(error.response.data.error);
+				}
+			});
+		if (response && response.status === 200) {
+			handleLogin(formData.email, formData.password);
+		}
 	}
 
 	return (
@@ -44,6 +65,8 @@ export function AuthProvider({ children }) {
 				onLogin: handleLogin,
 				onLogout: handleLogout,
 				onRegister: handleRegister,
+				authError,
+				setAuthError,
 			}}
 		>
 			{children}
@@ -57,11 +80,15 @@ export function useAuth() {
 		onLogin: handleLogin,
 		onLogout: handleLogout,
 		onRegister: handleRegister,
+		authError,
+		setAuthError,
 	} = useContext(AuthContext);
 	return {
 		token,
 		onLogin: handleLogin,
 		onLogout: handleLogout,
 		onRegister: handleRegister,
+		authError,
+		setAuthError,
 	};
 }

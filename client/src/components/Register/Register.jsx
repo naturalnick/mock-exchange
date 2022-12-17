@@ -1,74 +1,123 @@
-import { useState } from "react";
+import { Formik } from "formik";
+import * as yup from "yup";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Card from "react-bootstrap/Card";
 import { useAuth } from "../../context/AuthProvider";
 import "./Register.css";
 
+const schema = yup.object().shape({
+	email: yup.string().email().required("Valid email is required."),
+	password: yup
+		.string()
+		.min(4, "Must be 4 or more characters")
+		.required("Password is required."),
+	matchingPassword: yup
+		.string()
+		.oneOf([yup.ref("password"), null], "Passwords must match.")
+		.required("You must confirm your password."),
+});
+
 export default function Register({ setIsRegistering }) {
-	const [email, setEmail] = useState("");
-	const [password, setPassword] = useState("");
-	const [matchingPassword, setMatchingPassword] = useState("");
+	const { onRegister, authError, setAuthError } = useAuth();
 
-	const { onRegister } = useAuth();
-
-	function handleClick() {
-		//validate form here
-		onRegister(email, password);
-	}
+	//onRegister(email, password);
 
 	return (
 		<Card className="login-card">
 			<Card.Body>
 				<Card.Title>Register</Card.Title>
-				<Form className="max-width">
-					<Form.Group className="mb-3" controlId="email-group">
-						<Form.Label>Email</Form.Label>
-						<Form.Control
-							type="email"
-							placeholder="eg. name@email.com"
-							value={email || ""}
-							onChange={(e) => setEmail(e.target.value)}
-						/>
-						<Form.Text className="text-muted">
-							For authentication only, we'll never share it with anyone
-							else.
-						</Form.Text>
-					</Form.Group>
+				<div className="error">{authError}</div>
+				<Formik
+					validationSchema={schema}
+					onSubmit={(formData) => onRegister(formData)}
+					initialValues={{
+						email: "",
+						password: "",
+						matchingPassword: "",
+					}}
+				>
+					{({
+						handleSubmit,
+						handleChange,
+						handleBlur,
+						values,
+						touched,
+						isValid,
+						errors,
+					}) => (
+						<Form noValidate onSubmit={handleSubmit}>
+							<Form.Group className="mb-3" controlId="email-group">
+								<Form.Label>Email</Form.Label>
+								<Form.Control
+									required
+									type="email"
+									name="email"
+									placeholder="eg. name@email.com"
+									value={values.email}
+									onChange={handleChange}
+									isInvalid={!!errors.email}
+								/>
+								<Form.Control.Feedback type="invalid">
+									{errors.email}
+								</Form.Control.Feedback>
+							</Form.Group>
 
-					<Form.Group className="mb-3" controlId="formBasicPassword">
-						<Form.Label>Password</Form.Label>
-						<Form.Control
-							type="password"
-							placeholder="Password"
-							value={password || ""}
-							onChange={(e) => setPassword(e.target.value)}
-						/>
-					</Form.Group>
-					<Form.Group className="mb-3" controlId="formBasicPassword">
-						<Form.Label>Confirm Password</Form.Label>
-						<Form.Control
-							type="password"
-							placeholder="Re-type Password"
-							value={matchingPassword || ""}
-							onChange={(e) => setMatchingPassword(e.target.value)}
-						/>
-					</Form.Group>
-					<div className="text-center mb-3">
-						<Button
-							className="me-auto"
-							variant="primary"
-							onClick={handleClick}
-						>
-							Sign Up
-						</Button>
-					</div>
-				</Form>
+							<Form.Group className="mb-3" controlId="formBasicPassword">
+								<Form.Label>Password</Form.Label>
+								<Form.Control
+									required
+									minLength={"4"}
+									type="password"
+									name="password"
+									placeholder="Password"
+									value={values.password}
+									isValid={touched.password && !errors.password}
+									isInvalid={touched.password && errors.password}
+									onChange={handleChange}
+								/>
+								<Form.Control.Feedback type="invalid">
+									{errors.password}
+								</Form.Control.Feedback>
+							</Form.Group>
+							<Form.Group className="mb-3" controlId="formBasicPassword">
+								<Form.Label>Confirm Password</Form.Label>
+								<Form.Control
+									required
+									type="password"
+									name="matchingPassword"
+									placeholder="Re-type Password"
+									value={values.matchingPassword}
+									isValid={
+										touched.matchingPassword &&
+										!errors.matchingPassword
+									}
+									isInvalid={
+										touched.matchingPassword &&
+										errors.matchingPassword
+									}
+									onChange={handleChange}
+								/>
+								<Form.Control.Feedback type="invalid">
+									{errors.matchingPassword}
+								</Form.Control.Feedback>
+							</Form.Group>
+							<div className="text-center mb-3">
+								<Button variant="primary" type="submit">
+									Sign Up
+								</Button>
+							</div>
+						</Form>
+					)}
+				</Formik>
 				<div className="type-text">
 					Have an account?{" "}
 					<span
 						className="type-link"
-						onClick={() => setIsRegistering(false)}
+						onClick={() => {
+							setAuthError("");
+							setIsRegistering(false);
+						}}
 					>
 						Sign In
 					</span>

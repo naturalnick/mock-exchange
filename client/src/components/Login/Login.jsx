@@ -8,39 +8,57 @@ import "./Login.css";
 export default function Login({ setIsRegistering }) {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
+	const [validated, setValidated] = useState(false);
 
-	const { onLogin } = useAuth();
+	const { onLogin, authError, setAuthError } = useAuth();
 
-	function handleClick() {
-		//validate form here
-		onLogin(email, password);
+	function handleSubmit(event) {
+		event.preventDefault();
+		event.stopPropagation();
+
+		setValidated(true);
+
+		const form = event.currentTarget;
+		if (form.checkValidity() === true) {
+			onLogin(email, password);
+		}
 	}
+
 	return (
 		<Card className="login-card">
 			<Card.Body>
 				<Card.Title>Log In</Card.Title>
-				<Form className="max-width">
+				<div className="error">{authError}</div>
+				<Form noValidate validated={validated} onSubmit={handleSubmit}>
 					<Form.Group className="mb-3" controlId="email-group">
 						<Form.Label>Email</Form.Label>
 						<Form.Control
+							required
 							type="email"
 							placeholder="eg. name@email.com"
 							value={email || ""}
 							onChange={(e) => setEmail(e.target.value)}
 						/>
+						<Form.Control.Feedback type="invalid">
+							Please provide a valid email.
+						</Form.Control.Feedback>
 					</Form.Group>
 
 					<Form.Group className="mb-3" controlId="formBasicPassword">
 						<Form.Label>Password</Form.Label>
 						<Form.Control
+							required
 							type="password"
 							placeholder="Password"
 							value={password || ""}
 							onChange={(e) => setPassword(e.target.value)}
 						/>
+						<Form.Control.Feedback type="invalid">
+							Password is required.
+						</Form.Control.Feedback>
 					</Form.Group>
 					<div className="text-center mb-3">
-						<Button variant="primary" onClick={handleClick}>
+						<Button variant="primary" type="submit">
 							Log In
 						</Button>
 					</div>
@@ -49,7 +67,10 @@ export default function Login({ setIsRegistering }) {
 					Not a member?{" "}
 					<span
 						className="type-link"
-						onClick={() => setIsRegistering(true)}
+						onClick={() => {
+							setAuthError("");
+							setIsRegistering(true);
+						}}
 					>
 						Sign Up
 					</span>
