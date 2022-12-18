@@ -31,15 +31,18 @@ def get_stock_data(symbol):
 	#print(data)
 
 	return {
-		"symbol": symbol,
+		"symbol": data["symbol"],
 		"companyName": data["companyName"],
 		"change": data["change"],
 		"changePercent": data["changePercent"],
+		"latestPrice": data["latestPrice"],
+		"high": data["high"],
+		"low": data["low"],
 		"askPrice": data["iexAskPrice"],
 		"bidPrice": data["iexBidPrice"],
 		"previousClose": data["previousClose"],
-		"openPrice": data["iexOpen"],
-		"closePrice": data["iexClose"],
+		"open": data["iexOpen"],
+		"close": data["iexClose"],
 		"week52High": data["week52High"],
 		"week52Low": data["week52Low"],
 		"isUSMarketOpen": data["isUSMarketOpen"],
