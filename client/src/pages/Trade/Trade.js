@@ -2,8 +2,10 @@ import axios from "axios";
 import { useState } from "react";
 import SearchBar from "../../components/SearchBar/SearchBar";
 import Stock from "../../components/Stock/Stock";
+import { useAccount } from "../../context/AccountProvider";
 
 export default function Trade() {
+	const { watchList } = useAccount();
 	const [stock, setStock] = useState({});
 
 	async function handleSearch(symbol) {
@@ -14,7 +16,24 @@ export default function Trade() {
 	}
 
 	function displayStocks() {
-		return Object.keys(stock).length !== 0 && <Stock {...stock} />;
+		return Object.keys(stock).length !== 0 ? (
+			<Stock {...stock} />
+		) : (
+			<p>Search results will show here...</p>
+		);
+	}
+
+	function displayWatchedStocks() {
+		return watchList.length > 0 ? (
+			watchList.map((item) => {
+				return <Stock key={item.symbol} {...item} />;
+			})
+		) : (
+			<p>
+				Search for stocks, then add them to your watchlist to for easy
+				access.
+			</p>
+		);
 	}
 
 	return (
@@ -25,8 +44,8 @@ export default function Trade() {
 				{displayStocks()}
 			</div>
 			<div>
-				{/* <h2>Watchlist</h2>
-				{displayStocks()} */}
+				<h2 className="mt-5">Watchlist</h2>
+				{displayWatchedStocks()}
 			</div>
 		</div>
 	);

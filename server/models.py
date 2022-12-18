@@ -5,6 +5,7 @@ class Account(db.Model):
 	email = db.Column(db.String, unique=True, nullable=False)
 	password = db.Column(db.String, nullable=False)
 	balance = db.Column(db.Float, nullable=False)
+	watch_list = db.Column(db.String, nullable=False)
 
 class Holdings(db.Model):
 	id = db.Column(db.Integer, db.Identity(start=1, cycle=True), primary_key=True)

@@ -30,23 +30,34 @@ export default function History() {
 		});
 	}
 
-	const holdingElements = transactions.map((holding) => {
-		const total = (Number(holding.price) * Number(holding.quantity))
-			.toFixed(3)
-			.slice(0, -1);
-		return (
-			<tr key={holding.id}>
-				<td>{formatDate(holding.date)}</td>
-				<td>{holding.symbol}</td>
-				<td>{holding.quantity < 0 ? "Sell" : "Buy"}</td>
-				<td>
-					{holding.quantity < 0 ? -holding.quantity : holding.quantity}
+	const holdingElements =
+		transactions.length > 0 ? (
+			transactions.map((holding) => {
+				const total = (Number(holding.price) * Number(holding.quantity))
+					.toFixed(3)
+					.slice(0, -1);
+				return (
+					<tr key={holding.id}>
+						<td>{formatDate(holding.date)}</td>
+						<td>{holding.symbol}</td>
+						<td>{holding.quantity < 0 ? "Sell" : "Buy"}</td>
+						<td>
+							{holding.quantity < 0
+								? -holding.quantity
+								: holding.quantity}
+						</td>
+						<td>${holding.price}</td>
+						<td>${total}</td>
+					</tr>
+				);
+			})
+		) : (
+			<tr>
+				<td style={{ textAlign: "center" }} colSpan={6}>
+					All your transactions will be recorded here.
 				</td>
-				<td>${holding.price}</td>
-				<td>${total}</td>
 			</tr>
 		);
-	});
 
 	return (
 		<>

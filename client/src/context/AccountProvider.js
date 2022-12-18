@@ -9,6 +9,7 @@ function AccountProvider({ children }) {
 	const [accountNumber, setAccountNumber] = useState("");
 	const [cashBalance, setCashBalance] = useState("");
 	const [holdings, setHoldings] = useState([]);
+	const [watchList, setWatchlist] = useState([]);
 
 	useEffect(() => {
 		updateAccountInfo();
@@ -21,8 +22,21 @@ function AccountProvider({ children }) {
 			`http://127.0.0.1:5001/api/account/info?token=${token}`
 		);
 		const accountInfo = response.data;
+
 		setAccountNumber(accountInfo.account_number);
 		setCashBalance(accountInfo.balance);
+		updateWatchlist(
+			accountInfo.watch_list.split(" ").filter((item) => item !== "")
+		);
+	}
+
+	async function updateWatchlist(watchList) {
+		const watchListData = [];
+		for (let i = 0; i < watchList.length; i++) {
+			const stockData = await getStockData(watchList[i]);
+			watchListData.push(stockData);
+		}
+		setWatchlist(watchListData);
 	}
 
 	async function updateAccountHoldings() {
@@ -34,9 +48,8 @@ function AccountProvider({ children }) {
 			const stockData = await getStockData(holdings[i].symbol);
 
 			holdings[i].marketValue =
-				stockData.askPrice === 0
-					? stockData.closePrice
-					: stockData.askPrice;
+				stockData.askPrice === 0 ? stockData.close : stockData.askPrice;
+
 			holdings[i].companyName = stockData.companyName;
 		}
 		setHoldings(response.data.holdings);
@@ -55,8 +68,10 @@ function AccountProvider({ children }) {
 				accountNumber,
 				cashBalance,
 				holdings,
+				watchList,
 				updateAccountInfo,
 				updateAccountHoldings,
+				getStockData,
 			}}
 		>
 			{children}

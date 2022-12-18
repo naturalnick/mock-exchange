@@ -2,6 +2,7 @@
 	background-color: white;
 	padding: 15px;
 	color: black;
+	margin-bottom: 25px;
 }
 
 .stock-header {
@@ -16,18 +17,10 @@
 	font-size: 10pt;
 }
 
-.trade-btn {
-	margin-top: -10px;
-}
 .closed {
 	font-size: 10pt;
-	margin-bottom: 20px;
 }
 
 .align-right {
 	text-align: right;
-}
-
-hr {
-	margin-top: 30px;
 }

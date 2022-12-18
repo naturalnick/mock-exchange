@@ -7,7 +7,10 @@ import { useAuth } from "../../context/AuthProvider";
 import "./Register.css";
 
 const schema = yup.object().shape({
-	email: yup.string().email().required("Valid email is required."),
+	email: yup
+		.string()
+		.email("Not a valid email.")
+		.required("Email is required."),
 	password: yup
 		.string()
 		.min(4, "Must be 4 or more characters")
@@ -20,9 +23,6 @@ const schema = yup.object().shape({
 
 export default function Register({ setIsRegistering }) {
 	const { onRegister, authError, setAuthError } = useAuth();
-
-	//onRegister(email, password);
-
 	return (
 		<Card className="login-card">
 			<Card.Body>
@@ -37,15 +37,7 @@ export default function Register({ setIsRegistering }) {
 						matchingPassword: "",
 					}}
 				>
-					{({
-						handleSubmit,
-						handleChange,
-						handleBlur,
-						values,
-						touched,
-						isValid,
-						errors,
-					}) => (
+					{({ handleSubmit, handleChange, values, touched, errors }) => (
 						<Form noValidate onSubmit={handleSubmit}>
 							<Form.Group className="mb-3" controlId="email-group">
 								<Form.Label>Email</Form.Label>

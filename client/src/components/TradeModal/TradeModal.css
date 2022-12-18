@@ -16,3 +16,8 @@
 .stack-form {
 	margin-top: 10px;
 }
+
+.feedback {
+	font-size: 11pt;
+	color: red;
+}
