@@ -1,7 +1,7 @@
 from database import db
 
 class Account(db.Model):
-	id = db.Column(db.Integer, primary_key=True)
+	id = db.Column(db.Float, primary_key=True)
 	email = db.Column(db.String, unique=True, nullable=False)
 	password = db.Column(db.String, nullable=False)
 	balance = db.Column(db.Float, nullable=False)

@@ -4,13 +4,16 @@ import os
 from datetime import datetime
 import pytz
 from dotenv import load_dotenv
-from database import db
 from models import Account, Holdings, Transactions
 from helpers import generate_account_id, generate_token, decode_token
 import iex
-import json
+from cryptography.fernet import Fernet
+from database import db
 
 load_dotenv()
+
+password_key = os.getenv("PASSWORD_KEY").encode("utf-8")
+fernet = Fernet(password_key)
 
 def create_app():
 	app = Flask(__name__)
@@ -28,6 +31,7 @@ with app.app_context():
 
 @app.route("/")
 def index():
+	get_account("nick@nick.com")
 	return "Hello"
 
 
@@ -40,7 +44,9 @@ def login_user():
 		return {"error": "Account does not exist for that email."}, 404
 
 	account = get_account(email)
-	if password != account.password:
+	decrypted_pass = fernet.decrypt(account.password.encode("utf-8")).decode()
+	
+	if password != decrypted_pass:
 		return {"error": "Incorrect password."}, 401
 
 	return {"token": generate_token(email)}, 200
@@ -61,7 +67,7 @@ def register_user():
 @app.route("/api/stock", methods=["GET"])
 def get_stock():
 	stock_symbol = request.args.get("symbol")
-	print(stock_symbol)
+
 	data = iex.get_stock_data(stock_symbol)
 	return data, 200
 
@@ -127,9 +133,9 @@ def trade():
 
 	transaction_amount = float(transaction["quantity"]) * float(transaction["cost_per_share"])
 
-	adjustBalance(account.id, account.balance, transaction_amount)
-	modifyHoldings(**transaction)
-	logTransaction(**transaction)
+	modify_holdings(**transaction)
+	adjust_balance(account.id, account.balance, transaction_amount)
+	log_transaction(**transaction)
 	return "Ok", 200
 
 
@@ -146,12 +152,12 @@ def update_watchlist(email, symbol, type="add"):
 	db.session.commit()
 
 
-def adjustBalance(account_number, balance, amount):
+def adjust_balance(account_number, balance, amount):
 	db.session.query(Account).filter(Account.id == account_number).update({"balance": balance - amount})
 	db.session.commit()
 	
 
-def modifyHoldings(account_number, symbol, quantity, cost_per_share):
+def modify_holdings(account_number, symbol, quantity, cost_per_share):
 	result = db.session.query(Holdings).filter(Holdings.account_number == account_number, Holdings.symbol == symbol).all()
 	if len(result) > 0:
 		holding = result[0]
@@ -162,7 +168,7 @@ def modifyHoldings(account_number, symbol, quantity, cost_per_share):
 		else:
 			new_price = holding.base_cost
 
-		db.session.query(Holdings).filter(Holdings.account_number == account_number and Holdings.symbol == symbol).update({"shares": new_quantity, "base_cost": new_price})
+		db.session.query(Holdings).filter(Holdings.account_number == account_number, Holdings.symbol == symbol).update({"shares": new_quantity, "base_cost": new_price})
 	
 	else:
 		new_holding = Holdings(account_number=account_number, symbol=symbol, shares=quantity, base_cost=cost_per_share)
@@ -171,7 +177,7 @@ def modifyHoldings(account_number, symbol, quantity, cost_per_share):
 	db.session.commit()
 
 
-def logTransaction(account_number, symbol, quantity, cost_per_share):
+def log_transaction(account_number, symbol, quantity, cost_per_share):
 	date = datetime.now().astimezone(pytz.utc)
 	newTransaction = Transactions(account_number=account_number, date=date, symbol=symbol, shares=quantity, price=cost_per_share)
 	db.session.add(newTransaction)
@@ -182,8 +188,10 @@ def create_account(email, password):
 	while(True):
 		account_id = generate_account_id()
 		if check_account_number_exists(account_id) == False: break
-	#encrypt password
-	newAccount = Account(id=account_id, email=email, password=password, balance=100000, watch_list='[]')
+
+	encrypted_pass = fernet.encrypt(password.encode()).decode()
+
+	newAccount = Account(id=account_id, email=email, password=encrypted_pass, balance=100000, watch_list='[]')
 	db.session.add(newAccount)
 	db.session.commit()
 

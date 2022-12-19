@@ -14,7 +14,9 @@ export default function Holdings() {
 				const baseCostTotal = (
 					holding.base_cost * holding.quantity
 				).toFixed(2);
-				const gainLoss = (baseCostTotal - marketValueTotal).toFixed(2);
+				const gainLoss = Number(
+					(baseCostTotal - marketValueTotal).toFixed(2)
+				);
 				return (
 					<tr key={holding.id}>
 						<td>{holding.symbol}</td>
@@ -22,7 +24,11 @@ export default function Holdings() {
 						<td>{holding.quantity}</td>
 						<td>{marketValueTotal}</td>
 						<td>{baseCostTotal}</td>
-						<td>
+						<td
+							style={
+								gainLoss < 0 ? { color: "red" } : { color: "green" }
+							}
+						>
 							{gainLoss > 0 && "+"}
 							{gainLoss}
 						</td>

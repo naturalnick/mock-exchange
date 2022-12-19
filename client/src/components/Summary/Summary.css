@@ -1,3 +1,11 @@
 .table {
 	background-color: white;
 }
+
+.total-increase {
+	color: green;
+}
+
+.total-decrease {
+	color: red;
+}

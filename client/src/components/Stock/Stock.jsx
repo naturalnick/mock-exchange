@@ -4,10 +4,32 @@ import Col from "react-bootstrap/esm/Col";
 import Row from "react-bootstrap/esm/Row";
 import "./Stock.css";
 import Button from "react-bootstrap/esm/Button";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Popover from "react-bootstrap/Popover";
 import TradeModal from "../TradeModal/TradeModal";
 import { useAuth } from "../../context/AuthProvider";
 import { useAccount } from "../../context/AccountProvider";
 import { useEffect } from "react";
+
+const askPricePopover = (
+	<Popover id="ask-price-popover">
+		<Popover.Header as="h3">Ask Price</Popover.Header>
+		<Popover.Body>
+			The lowest price at which a seller will sell the stock at any given
+			time.
+		</Popover.Body>
+	</Popover>
+);
+
+const bidPricePopover = (
+	<Popover id="bid-price-popover">
+		<Popover.Header>Bid Price</Popover.Header>
+		<Popover.Body>
+			The highest price a buyer will pay to buy a specified number of shares
+			of a stock at any given time.
+		</Popover.Body>
+	</Popover>
+);
 
 export default function Stock({
 	symbol,
@@ -98,19 +120,41 @@ export default function Stock({
 				</Col>
 				<Col>
 					<div className="stock-stat-header">Todays's Change</div>
-					<div className="stock-stat">
+					<div
+						className={`stock-stat ${
+							change < 0 ? "decrease" : "increase"
+						}`}
+					>
 						{change < 0 && "-"}${change < 0 && String(change).slice(1)} (
 						{Number(changePercent) * 100}%)
 					</div>
 				</Col>
 				<Col>
-					<div className="stock-stat-header">Bid Price</div>
+					<div className="stock-stat-header">
+						Bid Price{" "}
+						<OverlayTrigger placement="bottom" overlay={bidPricePopover}>
+							<img
+								src={require("../../images/info.png")}
+								alt="info"
+								width={"17px"}
+							/>
+						</OverlayTrigger>
+					</div>
 					<div className="stock-stat">
 						{bidPrice !== null ? bidPrice : "-"}
 					</div>
 				</Col>
 				<Col>
-					<div className="stock-stat-header">Ask Price</div>
+					<div className="stock-stat-header">
+						Ask Price{" "}
+						<OverlayTrigger placement="bottom" overlay={askPricePopover}>
+							<img
+								src={require("../../images/info.png")}
+								alt="info"
+								width={"17px"}
+							/>
+						</OverlayTrigger>
+					</div>
 					<div className="stock-stat">
 						{askPrice !== null ? askPrice : "-"}
 					</div>
