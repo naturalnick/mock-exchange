@@ -17,10 +17,22 @@
 	font-size: 10pt;
 }
 
+.popover-header {
+	color: black;
+}
+
 .closed {
 	font-size: 10pt;
 }
 
 .align-right {
 	text-align: right;
+}
+
+.decrease {
+	color: red;
+}
+
+.increase {
+	color: green;
 }

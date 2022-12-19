@@ -10,10 +10,20 @@ body {
 	color: #d8e9a8;
 }
 
-.navbar {
-	margin-bottom: 5%;
-}
-
 .logout:hover {
 	color: red;
+}
+
+.current-page {
+	color: #0c55c1;
+}
+
+.page {
+	padding: 5% 3%;
+}
+
+.logo {
+	font-family: "Courier New", Courier, monospace;
+	font-weight: bold;
+	font-size: 18pt;
 }

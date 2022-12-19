@@ -24,6 +24,10 @@ export default function Login({ setIsRegistering }) {
 		}
 	}
 
+	function handleKeyDown(e) {
+		if (e.key === "Enter") handleSubmit(e);
+	}
+
 	return (
 		<Card className="login-card">
 			<Card.Body>
@@ -52,6 +56,7 @@ export default function Login({ setIsRegistering }) {
 							placeholder="Password"
 							value={password || ""}
 							onChange={(e) => setPassword(e.target.value)}
+							onKeyDown={handleKeyDown}
 						/>
 						<Form.Control.Feedback type="invalid">
 							Password is required.

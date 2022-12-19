@@ -7,7 +7,7 @@ load_dotenv()
 
 def generate_account_id():
 	account_number = ""
-	for x in range(1, 10):
+	for x in range(0, 16):
 		account_number += str(random.randrange(0, 10))
 	return account_number
 
@@ -23,3 +23,4 @@ def decode_token(token):
 		return None
 	else:
 		return decoded
+

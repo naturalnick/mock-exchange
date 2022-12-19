@@ -5,7 +5,7 @@ export default function Hero() {
 		<div>
 			<h2>Risk-free investing.</h2>
 			<p>
-				Simulate stock investments with fake money to learn how stocks work
+				Simulate investments on the stock market to learn how stocks work
 				and experience the ups and downs of the stock market in a risk free
 				environment.
 			</p>

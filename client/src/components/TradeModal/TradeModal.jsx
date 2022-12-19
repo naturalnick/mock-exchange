@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -6,6 +6,7 @@ import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Stack from "react-bootstrap/Stack";
+import InputGroup from "react-bootstrap/InputGroup";
 import Alert from "react-bootstrap/Alert";
 import Select from "react-select";
 import { useAccount } from "../../context/AccountProvider";
@@ -30,22 +31,22 @@ export default function TradeModal({
 	const { cashBalance, holdings, updateAccountInfo, updateAccountHoldings } =
 		useAccount();
 	const { token } = useAuth();
-
 	const [total, setTotal] = useState(0);
+	const [shareHolding, setShareHolding] = useState();
+
+	useEffect(() => {
+		for (let i = 0; i < holdings.length; i++) {
+			if (holdings[i].symbol === symbol) {
+				setShareHolding(holdings[i].quantity);
+				break;
+			}
+		}
+	}, [holdings, symbol]);
 
 	const options = [
 		{ value: "buy", label: "Buy" },
 		{ value: "sell", label: "Sell" },
 	];
-
-	function getCurrentHoldings() {
-		for (let i = 0; i < holdings.length; i++) {
-			if (holdings[i].symbol === symbol) {
-				return holdings[i].quantity;
-			}
-		}
-		return 0;
-	}
 
 	function getNewTotal(quantity) {
 		return (Number(price) * Number(quantity)).toFixed(3).slice(0, -1);
@@ -72,8 +73,18 @@ export default function TradeModal({
 		}
 	}
 
-	function displayBalanceError() {
-		return <Alert variant="danger">You do not have enough funds.</Alert>;
+	function displayBalanceError(selectedAction) {
+		if (cashBalance < total && selectedAction === "buy")
+			return <Alert variant="danger">You do not have enough funds.</Alert>;
+	}
+
+	function displaySharesError(selectedAction, selectedQuantity) {
+		if (selectedQuantity > shareHolding && selectedAction === "sell")
+			return (
+				<Alert variant="danger">
+					You do not have that many shares to sell.
+				</Alert>
+			);
 	}
 
 	return (
@@ -97,6 +108,7 @@ export default function TradeModal({
 						touched,
 						errors,
 						isSubmitting,
+						setValues,
 					}) => (
 						<Form noValidate onSubmit={handleSubmit}>
 							<span className="trade-price">${price}</span> / share
@@ -118,32 +130,46 @@ export default function TradeModal({
 								</Form.Group>
 								<Form.Group className="mb-3" controlId="quantity">
 									<Form.Label>Quantity</Form.Label>
-									<Form.Control
-										required
-										type="number"
-										name="quantity"
-										placeholder="Number of shares"
-										value={values.quantity}
-										onChange={(e) => {
-											handleChange(e);
-											setTotal(getNewTotal(e.target.value));
-										}}
-										isInvalid={touched.quantity && errors.quantity}
-									/>
+									<InputGroup>
+										<Form.Control
+											required
+											type="number"
+											name="quantity"
+											placeholder="Number of shares"
+											value={values.quantity}
+											onChange={(e) => {
+												handleChange(e);
+												setTotal(getNewTotal(e.target.value));
+											}}
+											isInvalid={touched.quantity && errors.quantity}
+										/>
+										{shareHolding > 0 && (
+											<Button
+												variant="outline-secondary"
+												onClick={() =>
+													setValues({
+														...values,
+														quantity: shareHolding,
+													})
+												}
+											>
+												Sell All
+											</Button>
+										)}
+									</InputGroup>
 								</Form.Group>
 							</Stack>
 							<div className="feedback">
 								{errors.quantity}
-								<br />
+								{errors.quantity && errors.quantity && <br />}
 								{errors.action}
 							</div>
 							Total: <span className="trade-price">${total}</span>
-							{cashBalance < total && displayBalanceError()}
+							{displayBalanceError(values.action)}
+							{displaySharesError(values.action, values.quantity)}
 							<div className="trade-extra">
-								<div>Available funds: ${cashBalance}</div>
-								<div>
-									Shares currently owned: {getCurrentHoldings()}
-								</div>
+								<div>Available funds: ${cashBalance.toFixed(2)}</div>
+								<div>Shares currently owned: {shareHolding}</div>
 							</div>
 							<hr />
 							<Stack direction="horizontal" gap={3}>
@@ -157,7 +183,11 @@ export default function TradeModal({
 								<Button
 									variant="success"
 									type="submit"
-									disabled={cashBalance < total || isSubmitting}
+									disabled={
+										cashBalance < total ||
+										values.quantity > shareHolding ||
+										isSubmitting
+									}
 								>
 									Trade
 								</Button>
