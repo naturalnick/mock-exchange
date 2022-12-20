@@ -5,31 +5,11 @@ import Row from "react-bootstrap/esm/Row";
 import "./Stock.css";
 import Button from "react-bootstrap/esm/Button";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import Popover from "react-bootstrap/Popover";
+import { askPricePopover, bidPricePopover } from "../Popovers/Popovers";
 import TradeModal from "../TradeModal/TradeModal";
 import { useAuth } from "../../context/AuthProvider";
 import { useAccount } from "../../context/AccountProvider";
 import { useEffect } from "react";
-
-const askPricePopover = (
-	<Popover id="ask-price-popover">
-		<Popover.Header as="h3">Ask Price</Popover.Header>
-		<Popover.Body>
-			The lowest price at which a seller will sell the stock at any given
-			time.
-		</Popover.Body>
-	</Popover>
-);
-
-const bidPricePopover = (
-	<Popover id="bid-price-popover">
-		<Popover.Header>Bid Price</Popover.Header>
-		<Popover.Body>
-			The highest price a buyer will pay to buy a specified number of shares
-			of a stock at any given time.
-		</Popover.Body>
-	</Popover>
-);
 
 export default function Stock({
 	symbol,
@@ -37,12 +17,12 @@ export default function Stock({
 	latestPrice,
 	high,
 	low,
-	askPrice,
-	bidPrice,
+	iexAskPrice,
+	iexBidPrice,
 	change,
 	changePercent,
-	open,
-	close,
+	iexOpen,
+	iexClose,
 	previousClose,
 	week52High,
 	week52Low,
@@ -86,6 +66,15 @@ export default function Stock({
 		}
 	}
 
+	function displayTodaysChange() {
+		return (
+			<div className={`stock-stat ${change < 0 ? "decrease" : "increase"}`}>
+				{change < 0 && "-"}${change < 0 && String(change).slice(1)} (
+				{(Number(changePercent) * 100).toFixed(2)}%)
+			</div>
+		);
+	}
+
 	return (
 		<div className="stock-card">
 			<Row className="mb-2">
@@ -96,7 +85,7 @@ export default function Stock({
 				</Col>
 				<Col md={4}>
 					<Button
-						disabled={isUSMarketOpen}
+						disabled={!isUSMarketOpen}
 						size="sm"
 						variant="success"
 						onClick={handleShow}
@@ -120,14 +109,7 @@ export default function Stock({
 				</Col>
 				<Col>
 					<div className="stock-stat-header">Todays's Change</div>
-					<div
-						className={`stock-stat ${
-							change < 0 ? "decrease" : "increase"
-						}`}
-					>
-						{change < 0 && "-"}${change < 0 && String(change).slice(1)} (
-						{Number(changePercent) * 100}%)
-					</div>
+					{displayTodaysChange()}
 				</Col>
 				<Col>
 					<div className="stock-stat-header">
@@ -141,7 +123,7 @@ export default function Stock({
 						</OverlayTrigger>
 					</div>
 					<div className="stock-stat">
-						{bidPrice !== null ? bidPrice : "-"}
+						{iexBidPrice !== 0 ? iexBidPrice : "-"}
 					</div>
 				</Col>
 				<Col>
@@ -156,24 +138,24 @@ export default function Stock({
 						</OverlayTrigger>
 					</div>
 					<div className="stock-stat">
-						{askPrice !== null ? askPrice : "-"}
+						{iexAskPrice !== 0 ? iexAskPrice : "-"}
 					</div>
 				</Col>
 			</Row>
 			<Row className="mb-2">
 				<Col>
 					<div className="stock-stat-header">Open Price</div>
-					<div className="stock-stat-secondary">{open}</div>
+					<div className="stock-stat-secondary">${iexOpen}</div>
 				</Col>
 				<Col>
 					<div className="stock-stat-header">Close Price</div>
 					<div className="stock-stat-secondary">
-						{isUSMarketOpen ? "-" : close}
+						{isUSMarketOpen ? "-" : `$${iexClose}`}
 					</div>
 				</Col>
 				<Col>
 					<div className="stock-stat-header">Previous Close</div>
-					<div className="stock-stat-secondary">{previousClose}</div>
+					<div className="stock-stat-secondary">${previousClose}</div>
 				</Col>
 				<Col>
 					<div className="stock-stat-header">Day High/Low</div>

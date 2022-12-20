@@ -40,7 +40,6 @@ export function AuthProvider({ children }) {
 	}
 
 	async function handleRegister(formData) {
-		console.log(formData);
 		const response = await axios
 			.post("http://127.0.0.1:5001/register", {
 				email: formData.email,

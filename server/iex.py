@@ -11,39 +11,18 @@ def get_iex_api_url(symbol):
 	iex_endpoint_path = f"stable/stock/{stock_symbol}/quote"
 
 	iex_token = os.getenv("IEX_TOKEN")
-	iex_query_params = f"?token={iex_token}"
+	iex_filter = "symbol, companyName, change, changePercent,latestPrice,high,low,iexAskPrice,iexBidPrice,previousClose,iexOpen,iexClose,week52High,week52Low,isUSMarketOpen"
+	iex_query_params = f"?token={iex_token}&filter={iex_filter}"
 
 	return f"{iex_base_url}{iex_endpoint_path}{iex_query_params}"
 
 
 def get_stock_data(symbol):
-
 	iex_api_call = get_iex_api_url(symbol)
 
 	try:
 		response = requests.get(iex_api_call)
+		return response.json()
 	except:
 		print("Request error.")
 		return None
-
-	data = response.json()
-	# if we need more data from iex
-	#print(data)
-
-	return {
-		"symbol": data["symbol"],
-		"companyName": data["companyName"],
-		"change": data["change"],
-		"changePercent": data["changePercent"],
-		"latestPrice": data["latestPrice"],
-		"high": data["high"],
-		"low": data["low"],
-		"askPrice": data["iexAskPrice"],
-		"bidPrice": data["iexBidPrice"],
-		"previousClose": data["previousClose"],
-		"open": data["iexOpen"],
-		"close": data["iexClose"],
-		"week52High": data["week52High"],
-		"week52Low": data["week52Low"],
-		"isUSMarketOpen": data["isUSMarketOpen"],
-	}

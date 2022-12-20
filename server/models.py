@@ -1,7 +1,7 @@
 from database import db
 
 class Account(db.Model):
-	id = db.Column(db.Float, primary_key=True)
+	id = db.Column(db.String, primary_key=True)
 	email = db.Column(db.String, unique=True, nullable=False)
 	password = db.Column(db.String, nullable=False)
 	balance = db.Column(db.Float, nullable=False)
@@ -9,15 +9,21 @@ class Account(db.Model):
 
 class Holdings(db.Model):
 	id = db.Column(db.Integer, db.Identity(start=1, cycle=True), primary_key=True)
-	account_number = db.Column(db.Integer, nullable=False)
+	account_number = db.Column(db.String, nullable=False)
 	symbol = db.Column(db.String, unique=True, nullable=False)
 	shares = db.Column(db.Float, nullable=False)
 	base_cost = db.Column(db.Float, nullable=False)
 
 class Transactions(db.Model):
 	id = db.Column(db.Integer, db.Identity(start=1, cycle=True), primary_key=True)
-	account_number = db.Column(db.Integer, nullable=False)
+	account_number = db.Column(db.String, nullable=False)
 	date = db.Column(db.String, nullable=False)
 	symbol = db.Column(db.String, nullable=False)
 	shares = db.Column(db.Float, nullable=False)
 	price = db.Column(db.Float, nullable=False)
+
+class Values(db.Model):
+	id = db.Column(db.Integer, db.Identity(start=1, cycle=True), primary_key=True)
+	account_number = db.Column(db.String, nullable=False)
+	date = db.Column(db.String, nullable=False)
+	value = db.Column(db.Float, nullable=False)
