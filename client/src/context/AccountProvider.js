@@ -28,7 +28,9 @@ function AccountProvider({ children }) {
 		setAccountNumber(Number(accountInfo.account_number));
 		setCashBalance(Number(accountInfo.balance));
 		updateWatchlist(
-			accountInfo.watch_list.split(" ").filter((item) => item !== "")
+			accountInfo.watch_list
+				.split(" ")
+				.filter((item) => item !== "" && item !== "[]")
 		);
 	}
 

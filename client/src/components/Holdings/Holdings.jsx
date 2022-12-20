@@ -22,14 +22,14 @@ export default function Holdings() {
 						<td>{holding.symbol}</td>
 						<td>{holding.companyName}</td>
 						<td>{holding.quantity}</td>
-						<td>{marketValueTotal}</td>
-						<td>{baseCostTotal}</td>
+						<td>${marketValueTotal}</td>
+						<td>${baseCostTotal}</td>
 						<td
 							style={
 								gainLoss < 0 ? { color: "red" } : { color: "green" }
 							}
 						>
-							{gainLoss > 0 && "+"}
+							{gainLoss > 0 ? "+$" : "-$"}
 							{gainLoss}
 						</td>
 					</tr>

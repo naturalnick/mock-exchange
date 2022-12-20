@@ -24,12 +24,12 @@ export default function Home() {
 			<Row style={{ backgroundColor: "#212529", padding: "20px" }}>
 				<Col sm={9}>
 					<h4 style={{ marginRight: "20%" }}>
-						Start with $100,000 (faux money) in your account when you sign
-						up.
+						Start with $100,000 (not real money) in your account when you
+						sign up.
 					</h4>
 					<br />
 					<h4 style={{ textAlign: "right", marginLeft: "20%" }}>
-						Use the virtual money to invest in real stocks. Watch as your
+						Use the fantasy money to invest in real stocks. Watch as your
 						investments go up and down.
 					</h4>
 					<br />

@@ -3,6 +3,7 @@ import Table from "react-bootstrap/Table";
 import Placeholder from "react-bootstrap/Placeholder";
 import { useAccount } from "../../context/AccountProvider";
 import "./Summary.css";
+import Charts from "../Charts/Charts";
 
 export default function Summary() {
 	const { cashBalance, holdings, isAccountLoading } = useAccount();
@@ -48,6 +49,7 @@ export default function Summary() {
 	return (
 		<>
 			<h3>Account Summary</h3>
+			<Charts />
 			<Table>
 				<thead>
 					<tr>

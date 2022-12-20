@@ -35,12 +35,13 @@ export default function TradeModal({
 	const [shareHolding, setShareHolding] = useState();
 
 	useEffect(() => {
+		let shareQuantity = 0;
 		for (let i = 0; i < holdings.length; i++) {
 			if (holdings[i].symbol === symbol) {
-				setShareHolding(holdings[i].quantity);
-				break;
+				shareQuantity = holdings[i].quantity;
 			}
 		}
+		setShareHolding(shareQuantity);
 	}, [holdings, symbol]);
 
 	const options = [
@@ -184,8 +185,10 @@ export default function TradeModal({
 									variant="success"
 									type="submit"
 									disabled={
-										cashBalance < total ||
-										values.quantity > shareHolding ||
+										(cashBalance < total &&
+											values.action === "buy") ||
+										(values.quantity > shareHolding &&
+											values.action === "sell") ||
 										isSubmitting
 									}
 								>

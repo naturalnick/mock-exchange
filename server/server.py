@@ -1,14 +1,17 @@
 from flask import Flask, request
 from flask_cors import CORS
+from queue import Queue, Empty
+from threading import Thread
 import os
-from datetime import datetime
+from datetime import datetime, date
 import pytz
 from dotenv import load_dotenv
-from models import Account, Holdings, Transactions
+from models import Account, Holdings, Transactions, Values
 from helpers import generate_account_id, generate_token, decode_token
 import iex
 from cryptography.fernet import Fernet
 from database import db
+import time
 
 load_dotenv()
 
@@ -20,6 +23,7 @@ def create_app():
 	app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DB_ACCESS")
 	CORS(app)
 	db.init_app(app)
+
 	return app
 
 app = create_app()
@@ -27,11 +31,10 @@ app = create_app()
 with app.app_context():
 	from models import Account
 	db.create_all()
-
+	
 
 @app.route("/")
 def index():
-	get_account("nick@nick.com")
 	return "Hello"
 
 
@@ -69,6 +72,8 @@ def get_stock():
 	stock_symbol = request.args.get("symbol")
 
 	data = iex.get_stock_data(stock_symbol)
+	if data is None:
+		return {"error": "Stock not found."}, 404
 	return data, 200
 
 
@@ -105,6 +110,19 @@ def account_holdings():
 	holdings = get_account_holdings(account.id)
 
 	return {"holdings": holdings}, 200
+
+
+@app.route("/api/account/values", methods=["GET"])
+def account_values():
+	token = request.args.get("token")
+	email = decode_token(token)["email"]
+
+	if decode_token(token) is None: return {"Error": "invalid token"}, 401
+
+	account = get_account(email)
+	values = get_account_values(account.id)
+
+	return {"values": values}, 200
 
 
 @app.route("/api/account/transactions", methods=["GET"])
@@ -191,8 +209,14 @@ def create_account(email, password):
 
 	encrypted_pass = fernet.encrypt(password.encode()).decode()
 
-	newAccount = Account(id=account_id, email=email, password=encrypted_pass, balance=100000, watch_list='[]')
+	starting_balance = 100000
+
+	newAccount = Account(id=account_id, email=email, password=encrypted_pass, balance=starting_balance, watch_list='[]')
 	db.session.add(newAccount)
+
+	new_total = Values(account_number=account_id, date=str(date.today()), value=starting_balance)
+	db.session.add(new_total)
+
 	db.session.commit()
 
 
@@ -209,6 +233,12 @@ def check_account_number_exists(id):
 	return False if db.session.get(Account, id) is None else True
 
 
+def check_daily_total_logged(date):
+	with app.app_context():
+		query = db.session.query(Values).filter(Values.date == date).first()
+		return False if query is None else True
+
+
 def get_account_holdings(account_number):
 	entries = db.session.query(Holdings).filter(Holdings.account_number == account_number).all()
 	holdings = []
@@ -217,6 +247,15 @@ def get_account_holdings(account_number):
 	return holdings
 
 
+def get_account_values(account_number):
+	entries = db.session.query(Values).filter(Values.account_number == account_number).order_by(Values.date).all()
+	values = []
+	for entry in entries:
+		print(entry)
+		values.append({"date": entry.date, "value": entry.value})
+	return values
+	
+
 def get_account_transactions(account_number):
 	entries = db.session.query(Transactions).filter(Transactions.account_number == account_number).all()
 	transactions = []
@@ -224,6 +263,55 @@ def get_account_transactions(account_number):
 		transactions.append({"id": entry.id, "date": entry.date, "symbol": entry.symbol, "quantity": entry.shares, "price":entry.price})
 	return transactions
 
+
+def set_account_totals(date):
+	with app.app_context():
+		accounts = db.session.query(Account).all()
+
+		for account in accounts:
+			holdings = get_account_holdings(account.id)
+
+			market_value_total = get_account_market_value(holdings)
+			account_value = round(account.balance + market_value_total, 2)
+
+			new_total = Values(account_number=account.id, date=date, value=account_value)
+			db.session.add(new_total)
+
+		db.session.commit()
+
+
+def get_account_market_value(holdings):
+	market_value_total = 0
+	for holding in holdings:
+		stock_data = iex.get_stock_data(holding["symbol"])
+		share_market_value = stock_data["latestPrice"]
+		market_value_total = market_value_total + (share_market_value * holding["quantity"])
+	return market_value_total
+
+
+def daily_totals():
+	while(True):
+		today = str(date.today())
+		current_hour = int(datetime.now().astimezone(pytz.utc).strftime("%H"))
+		us_market_closing_hour_utc = 21 # 4PM EST
+		sleeping_seconds = 3600
+
+		if current_hour < us_market_closing_hour_utc:
+			sleeping_seconds = (us_market_closing_hour_utc - current_hour) * 3600
+			print(f"Server status check. Date: {today}, Hour: {current_hour}/24 (UTC). Market is still open, waiting {sleeping_seconds/3600} hours to check again")
+
+		elif check_daily_total_logged(today) is False:
+			print(f"Server status check. Date: {today}, Hour: {current_hour}/24 (UTC). Market is now closed, assigning account totals, next check in {sleeping_seconds/3600} hours.")
+			set_account_totals(today)
+
+		else:
+			sleeping_seconds = 7200
+			print(f"Server status check. Date: {today}, Hour: {current_hour}/24 (UTC). Totals have already been assigned today. Next check in {sleeping_seconds/3600} hours. ")
+			
+		time.sleep(sleeping_seconds)
+
+
+Thread(target=daily_totals, daemon=True).start()
 
 if __name__ == "__main__":
 	app.run(debug=True,port=5001)
