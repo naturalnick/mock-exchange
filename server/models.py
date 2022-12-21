@@ -27,3 +27,8 @@ class Values(db.Model):
 	account_number = db.Column(db.String, nullable=False)
 	date = db.Column(db.String, nullable=False)
 	value = db.Column(db.Float, nullable=False)
+
+class StockReference(db.Model):
+	id = db.Column(db.Integer, db.Identity(start=1, cycle=True), primary_key=True)
+	symbol = db.Column(db.String, nullable=False)
+	company_name = db.Column(db.String, nullable=False)

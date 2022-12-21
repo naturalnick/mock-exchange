@@ -1,39 +1,16 @@
+import { useCallback } from "react";
 import Table from "react-bootstrap/Table";
 import { useAccount } from "../../context/AccountProvider";
+import HoldingRow from "./HoldingRow";
 import "./Holdings.css";
 
 export default function Holdings() {
 	const { holdings } = useAccount();
 
-	const holdingElements =
-		holdings.length > 0 ? (
+	const displayHoldings = useCallback(() => {
+		return holdings.length > 0 ? (
 			holdings.map((holding) => {
-				const marketValueTotal = (
-					holding.marketValue * holding.quantity
-				).toFixed(2);
-				const baseCostTotal = (
-					holding.base_cost * holding.quantity
-				).toFixed(2);
-				const gainLoss = Number(
-					(baseCostTotal - marketValueTotal).toFixed(2)
-				);
-				return (
-					<tr key={holding.id}>
-						<td>{holding.symbol}</td>
-						<td>{holding.companyName}</td>
-						<td>{holding.quantity}</td>
-						<td>${marketValueTotal}</td>
-						<td>${baseCostTotal}</td>
-						<td
-							style={
-								gainLoss < 0 ? { color: "red" } : { color: "green" }
-							}
-						>
-							{gainLoss > 0 ? "+$" : "-$"}
-							{gainLoss}
-						</td>
-					</tr>
-				);
+				return <HoldingRow key={holding.id} {...holding} />;
 			})
 		) : (
 			<tr>
@@ -42,6 +19,7 @@ export default function Holdings() {
 				</td>
 			</tr>
 		);
+	}, [holdings]);
 
 	return (
 		<>
@@ -57,7 +35,7 @@ export default function Holdings() {
 						<th>Gain/Loss</th>
 					</tr>
 				</thead>
-				<tbody>{holdingElements}</tbody>
+				<tbody>{displayHoldings()}</tbody>
 			</Table>
 		</>
 	);

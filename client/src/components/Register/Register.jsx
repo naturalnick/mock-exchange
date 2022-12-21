@@ -6,7 +6,7 @@ import Card from "react-bootstrap/Card";
 import { useAuth } from "../../context/AuthProvider";
 import "./Register.css";
 
-const schema = yup.object().shape({
+const registerSchema = yup.object().shape({
 	email: yup
 		.string()
 		.email("Not a valid email.")
@@ -29,7 +29,7 @@ export default function Register({ setIsRegistering }) {
 				<Card.Title>Register</Card.Title>
 				<div className="error">{authError}</div>
 				<Formik
-					validationSchema={schema}
+					validationSchema={registerSchema}
 					onSubmit={(formData) => onRegister(formData)}
 					initialValues={{
 						email: "",

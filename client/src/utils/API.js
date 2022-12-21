@@ -71,3 +71,30 @@ export async function getStockData(symbol) {
 
 	return response.status === 200 ? response.data : response;
 }
+
+export async function getStockList() {
+	const response = await axios
+		.get("http://127.0.0.1:5001/api/stock_list")
+		.catch((error) => {
+			if (error.message === "Network Error") {
+				return { error: "Server connection failed." };
+			} else {
+				return { error: error.response.data.error };
+			}
+		});
+
+	return response.status === 200 ? response.data : response;
+}
+
+export async function getTransactions(token) {
+	const response = await axios
+		.get(`http://127.0.0.1:5001/api/account/transactions?token=${token}`)
+		.catch((error) => {
+			if (error.message === "Network Error") {
+				return { error: "Server connection failed." };
+			} else {
+				return { error: error.response.data.error };
+			}
+		});
+	return response.status === 200 ? response.data.transactions : response;
+}

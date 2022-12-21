@@ -37,7 +37,7 @@ export default function Summary() {
 
 		newMarketValue = Number(newMarketValue.toFixed(2));
 		newBaseCost = Number(newBaseCost.toFixed(2));
-		const newGainsLosses = (newBaseCost - newMarketValue).toFixed(2); //string
+		const newGainsLosses = (newMarketValue - newBaseCost).toFixed(2); //string
 		const newAccountValue = (newMarketValue + cashBalance).toFixed(2); //string
 
 		setAccountValue(newAccountValue);
@@ -63,21 +63,36 @@ export default function Summary() {
 				<tbody>
 					<tr>
 						<th>
-							${isAccountLoading ? <Placeholder xs={4} /> : accountValue}
+							$
+							{isAccountLoading ? (
+								<Placeholder xs={6} animation="glow" />
+							) : (
+								accountValue
+							)}
 						</th>
 						<td>
 							$
 							{isAccountLoading ? (
-								<Placeholder xs={4} />
+								<Placeholder xs={6} animation="glow" />
 							) : (
 								Number(cashBalance.toFixed(2))
 							)}
 						</td>
 						<td>
-							${isAccountLoading ? <Placeholder xs={4} /> : marketValue}
+							$
+							{isAccountLoading ? (
+								<Placeholder xs={6} animation="glow" />
+							) : (
+								marketValue
+							)}
 						</td>
 						<td>
-							${isAccountLoading ? <Placeholder xs={4} /> : baseCost}
+							$
+							{isAccountLoading ? (
+								<Placeholder xs={6} animation="glow" />
+							) : (
+								baseCost
+							)}
 						</td>
 						<td
 							style={
@@ -85,7 +100,11 @@ export default function Summary() {
 							}
 						>
 							{gainsLosses > 0 && "+"}
-							{isAccountLoading ? <Placeholder xs={4} /> : gainsLosses}
+							{isAccountLoading ? (
+								<Placeholder bg="dark" xs={6} animation="glow" />
+							) : (
+								`$${gainsLosses}`
+							)}
 						</td>
 					</tr>
 				</tbody>
