@@ -1,38 +1,82 @@
-import { createContext, useContext, useState, useEffect } from "react";
-import axios from "axios";
+import {
+	createContext,
+	useContext,
+	useState,
+	useEffect,
+	useCallback,
+} from "react";
 import { useAuth } from "./AuthProvider";
+import {
+	getAccount,
+	getHoldings,
+	getStockData,
+	getDailyTotals,
+} from "../utils/API";
 
 const AccountContext = createContext();
 
 function AccountProvider({ children }) {
 	const { token } = useAuth();
-	const [accountNumber, setAccountNumber] = useState();
-	const [cashBalance, setCashBalance] = useState();
+	const [accountNumber, setAccountNumber] = useState(0);
+	const [cashBalance, setCashBalance] = useState(0);
 	const [holdings, setHoldings] = useState([]);
 	const [watchList, setWatchlist] = useState([]);
+	const [dailyTotals, setDailyTotals] = useState([]);
 	const [isAccountLoading, setIsAccountLoading] = useState(true);
+
+	const updateAccountInfo = useCallback(async () => {
+		setIsAccountLoading(true);
+		const account = await getAccount(token);
+
+		setAccountNumber(Number(account.account_number));
+		setCashBalance(Number(account.balance));
+		updateWatchlist(
+			account.watch_list
+				.split(" ")
+				.filter((item) => item !== "" && item !== "[]")
+			//TODO fix bug where emtpy array is saved to the watchlist when it's initially empty
+		);
+	}, [token]);
+
+	const updateAccountHoldings = useCallback(async () => {
+		const holdings = await getHoldings(token);
+
+		for (let i = 0; i < holdings.length; i++) {
+			const stockData = await getStockData(holdings[i].symbol);
+
+			holdings[i].marketValue = stockData.latestPrice;
+
+			holdings[i].companyName = stockData.companyName;
+		}
+
+		setHoldings(holdings);
+		setIsAccountLoading(false);
+	}, [token]);
+
+	const updateDailyTotals = useCallback(async () => {
+		const totals = await getDailyTotals(token);
+		let data = [["Date", "Value"]];
+
+		if (totals.length < 1) {
+			let today = new Date().toJSON().slice(0, 10);
+			data.push([today, Number(cashBalance)]);
+		} else {
+			for (let i = 0; i < totals.length; i++) {
+				data.push([totals[i].date, Number(totals[i].value)]);
+			}
+		}
+
+		setDailyTotals(data);
+	}, [cashBalance, token]);
+
+	useEffect(() => {
+		updateDailyTotals();
+	}, [updateDailyTotals]);
 
 	useEffect(() => {
 		updateAccountInfo();
 		updateAccountHoldings();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
-
-	async function updateAccountInfo() {
-		setIsAccountLoading(true);
-		const response = await axios.get(
-			`http://127.0.0.1:5001/api/account/info?token=${token}`
-		);
-		const accountInfo = response.data;
-
-		setAccountNumber(Number(accountInfo.account_number));
-		setCashBalance(Number(accountInfo.balance));
-		updateWatchlist(
-			accountInfo.watch_list
-				.split(" ")
-				.filter((item) => item !== "" && item !== "[]")
-		);
-	}
+	}, [updateAccountInfo, updateAccountHoldings]);
 
 	async function updateWatchlist(watchList) {
 		const watchListData = [];
@@ -43,30 +87,6 @@ function AccountProvider({ children }) {
 		setWatchlist(watchListData);
 	}
 
-	async function updateAccountHoldings() {
-		setIsAccountLoading(true);
-		const response = await axios.get(
-			`http://127.0.0.1:5001/api/account/holdings?token=${token}`
-		);
-		const holdings = response.data.holdings;
-		for (let i = 0; i < holdings.length; i++) {
-			const stockData = await getStockData(holdings[i].symbol);
-
-			holdings[i].marketValue = stockData.latestPrice;
-
-			holdings[i].companyName = stockData.companyName;
-		}
-		setHoldings(response.data.holdings);
-		setIsAccountLoading(false);
-	}
-
-	async function getStockData(symbol) {
-		const response = await axios.get(
-			`http://127.0.0.1:5001/api/stock?symbol=${symbol}`
-		);
-		return response.data;
-	}
-
 	return (
 		<AccountContext.Provider
 			value={{
@@ -74,9 +94,9 @@ function AccountProvider({ children }) {
 				cashBalance,
 				holdings,
 				watchList,
+				dailyTotals,
 				updateAccountInfo,
 				updateAccountHoldings,
-				getStockData,
 				isAccountLoading,
 			}}
 		>

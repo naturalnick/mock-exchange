@@ -92,11 +92,11 @@ def account_watchlist():
 	data = request.json
 	token = decode_token(data["token"])
 
-	if token is None: return {"Error": "invalid token"}, 401
+	if token is None: return {"error": "invalid token"}, 401
 
-	update_watchlist(token["email"], data["symbol"], type=data["action"])
+	update_watchlist(token["email"], data["symbol"], watch=data["shouldWatch"])
 
-	return "Successfully added.", 200
+	return {"Success": "Watchlist updated."}, 200
 
 
 @app.route("/api/account/holdings", methods=["GET"])
@@ -157,11 +157,11 @@ def trade():
 	return "Ok", 200
 
 
-def update_watchlist(email, symbol, type="add"):
+def update_watchlist(email, symbol, watch=True):
 	account = db.session.query(Account).filter(Account.email == email).first()
 
 	watch_list = account.watch_list.split(" ")
-	if (type != "add"):
+	if (watch != True):
 		watch_list.remove(symbol)
 	else:
 		watch_list.append(symbol)
@@ -251,7 +251,6 @@ def get_account_values(account_number):
 	entries = db.session.query(Values).filter(Values.account_number == account_number).order_by(Values.date).all()
 	values = []
 	for entry in entries:
-		print(entry)
 		values.append({"date": entry.date, "value": entry.value})
 	return values
 	

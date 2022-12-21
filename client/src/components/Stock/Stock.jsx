@@ -1,5 +1,4 @@
-import { useState } from "react";
-import axios from "axios";
+import { useState, useEffect } from "react";
 import Col from "react-bootstrap/esm/Col";
 import Row from "react-bootstrap/esm/Row";
 import "./Stock.css";
@@ -9,7 +8,7 @@ import { askPricePopover, bidPricePopover } from "../Popovers/Popovers";
 import TradeModal from "../TradeModal/TradeModal";
 import { useAuth } from "../../context/AuthProvider";
 import { useAccount } from "../../context/AccountProvider";
-import { useEffect } from "react";
+import { toggleWatched } from "../../utils/API";
 
 export default function Stock({
 	symbol,
@@ -50,20 +49,9 @@ export default function Stock({
 		minute: "2-digit",
 	})} ${today.toLocaleDateString()}`;
 
-	async function updateWatchlist() {
-		const response = await axios.post(
-			"http://127.0.0.1:5001/api/account/watchlist",
-			{
-				token: token,
-				symbol: symbol,
-				action: isWatched ? "remove" : "add",
-			}
-		);
-		if (response.status === 200) {
-			updateAccountInfo();
-		} else {
-			console.log("error");
-		}
+	async function handleWatchlist() {
+		await toggleWatched(token, symbol, !isWatched);
+		updateAccountInfo();
 	}
 
 	function displayTodaysChange() {
@@ -85,7 +73,7 @@ export default function Stock({
 				</Col>
 				<Col md={4}>
 					<Button
-						disabled={!isUSMarketOpen}
+						disabled={isUSMarketOpen}
 						size="sm"
 						variant="success"
 						onClick={handleShow}
@@ -97,7 +85,7 @@ export default function Stock({
 					</span>
 				</Col>
 				<Col md={4} className="align-right">
-					<Button size="sm" variant="secondary" onClick={updateWatchlist}>
+					<Button size="sm" variant="secondary" onClick={handleWatchlist}>
 						{isWatched ? "Remove from " : "Add to "} Watchlist
 					</Button>
 				</Col>
