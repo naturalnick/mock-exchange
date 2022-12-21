@@ -1,8 +1,8 @@
-import axios from "axios";
 import { useState } from "react";
 import SearchBar from "../../components/SearchBar/SearchBar";
 import Stock from "../../components/Stock/Stock";
 import { useAccount } from "../../context/AccountProvider";
+import { getStockData } from "../../utils/API";
 
 export default function Trade() {
 	const { watchList } = useAccount();
@@ -10,17 +10,12 @@ export default function Trade() {
 	const [error, setError] = useState("");
 
 	async function handleSearch(symbol) {
-		const response = await axios
-			.get(`http://127.0.0.1:5001/api/stock?symbol=${symbol}`)
-			.catch((error) => {
-				if (error.message === "Network Error") {
-					setError("Server connection failed.");
-				} else {
-					setError(error.response.data.error);
-				}
-				console.log(error);
-			});
-		if (response && response.status === 200) setStock(response.data);
+		setError("");
+		const stockData = await getStockData(symbol);
+
+		if ("error" in stockData) {
+			setError(stockData.error);
+		} else setStock(stockData);
 	}
 
 	function displayStocks() {

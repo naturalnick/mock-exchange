@@ -18,9 +18,8 @@ def get_iex_api_url(symbol):
 
 
 def get_stock_data(symbol):
-	iex_api_call = get_iex_api_url(symbol)
-
 	try:
+		iex_api_call = get_iex_api_url(symbol)
 		response = requests.get(iex_api_call)
 		return response.json()
 	except:
