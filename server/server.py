@@ -6,7 +6,7 @@ import os
 from datetime import datetime, date
 import pytz
 from dotenv import load_dotenv
-from models import Account, Holdings, Transactions, Values
+from models import Account, Holdings, Transactions, Values, StockReference
 from helpers import generate_account_id, generate_token, decode_token
 import iex
 from cryptography.fernet import Fernet
@@ -75,6 +75,15 @@ def get_stock():
 	if data is None:
 		return {"error": "Stock not found."}, 404
 	return data, 200
+
+
+@app.route("/api/stock_list", methods=["GET"])
+def get_stock_reference():
+
+	stocks = get_stock_list()
+	if stocks is None:
+		return {"error": "Stock not found."}, 404
+	return stocks, 200
 
 
 @app.route("/api/account/info", methods=["GET"])
@@ -309,6 +318,29 @@ def daily_totals():
 			
 		time.sleep(sleeping_seconds)
 
+
+def get_stock_list():
+	with app.app_context():
+		stock_list = []
+		for entry in db.session.query(StockReference).all():
+			stock = entry.__dict__
+			del stock["_sa_instance_state"]
+			stock_list.append(stock)
+		return stock_list
+
+
+def updateStockList():
+	with app.app_context():
+		entry = db.session.query(StockReference).first()
+		if entry is None: # only run once to save the list
+			stock_list = iex.get_stock_list()
+			for stock in stock_list:
+				newRef = StockReference(symbol=stock["symbol"], company_name=stock["company_name"])
+				db.session.add(newRef)
+			db.session.commit()
+
+
+updateStockList()
 
 Thread(target=daily_totals, daemon=True).start()
 

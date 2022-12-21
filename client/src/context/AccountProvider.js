@@ -6,12 +6,7 @@ import {
 	useCallback,
 } from "react";
 import { useAuth } from "./AuthProvider";
-import {
-	getAccount,
-	getHoldings,
-	getStockData,
-	getDailyTotals,
-} from "../utils/API";
+import { getAccount, getHoldings, getStockData } from "../utils/API";
 
 const AccountContext = createContext();
 
@@ -21,7 +16,6 @@ function AccountProvider({ children }) {
 	const [cashBalance, setCashBalance] = useState(0);
 	const [holdings, setHoldings] = useState([]);
 	const [watchList, setWatchlist] = useState([]);
-	const [dailyTotals, setDailyTotals] = useState([]);
 	const [isAccountLoading, setIsAccountLoading] = useState(true);
 
 	const updateAccountInfo = useCallback(async () => {
@@ -53,26 +47,6 @@ function AccountProvider({ children }) {
 		setIsAccountLoading(false);
 	}, [token]);
 
-	const updateDailyTotals = useCallback(async () => {
-		const totals = await getDailyTotals(token);
-		let data = [["Date", "Value"]];
-
-		if (totals.length < 1) {
-			let today = new Date().toJSON().slice(0, 10);
-			data.push([today, Number(cashBalance)]);
-		} else {
-			for (let i = 0; i < totals.length; i++) {
-				data.push([totals[i].date, Number(totals[i].value)]);
-			}
-		}
-
-		setDailyTotals(data);
-	}, [cashBalance, token]);
-
-	useEffect(() => {
-		updateDailyTotals();
-	}, [updateDailyTotals]);
-
 	useEffect(() => {
 		updateAccountInfo();
 		updateAccountHoldings();
@@ -94,7 +68,6 @@ function AccountProvider({ children }) {
 				cashBalance,
 				holdings,
 				watchList,
-				dailyTotals,
 				updateAccountInfo,
 				updateAccountHoldings,
 				isAccountLoading,
