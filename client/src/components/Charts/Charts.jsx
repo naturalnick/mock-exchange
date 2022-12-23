@@ -12,14 +12,18 @@ export default function Charts() {
 	const { holdings, cashBalance } = useAccount();
 	const [holdingsData, setHoldingsData] = useState([]);
 	const [dailyData, setDailyData] = useState([]);
+	const [totalMarketValue, setTotalMarketValue] = useState(0);
 
 	const updateHoldingsData = useCallback(() => {
 		let data = [["Holding", "Value"]];
 		data.push(["Cash", cashBalance]);
+		let total = 0;
 		for (let i = 0; i < holdings.length; i++) {
 			const marketValue = holdings[i].marketValue * holdings[i].quantity;
+			total = total + marketValue;
 			data.push([holdings[i].symbol, marketValue]);
 		}
+		setTotalMarketValue(total);
 		setHoldingsData(data);
 	}, [cashBalance, holdings]);
 
@@ -29,7 +33,8 @@ export default function Charts() {
 
 		if (totals.length < 1) {
 			let today = new Date().toJSON().slice(0, 10);
-			data.push([today, Number(cashBalance)]);
+
+			data.push([today, Number(totalMarketValue + cashBalance)]);
 		} else {
 			for (let i = 0; i < totals.length; i++) {
 				data.push([totals[i].date, Number(totals[i].value)]);
@@ -37,7 +42,7 @@ export default function Charts() {
 		}
 
 		setDailyData(data);
-	}, [cashBalance, token]);
+	}, [cashBalance, token, totalMarketValue]);
 
 	useEffect(() => {
 		updateHoldingsData();

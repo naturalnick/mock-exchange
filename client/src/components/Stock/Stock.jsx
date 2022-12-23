@@ -14,8 +14,6 @@ export default function Stock({
 	symbol,
 	companyName,
 	latestPrice,
-	high,
-	low,
 	iexAskPrice,
 	iexBidPrice,
 	change,
@@ -55,10 +53,14 @@ export default function Stock({
 	}
 
 	function displayTodaysChange() {
+		const changeStyle =
+			change < 0 ? "stock-stat decrease" : "stock-stat increase";
+		const changePrefix = change < 0 ? "-" : "+";
+		const formattedChange = change < 0 ? String(change).slice(1) : change;
+		const formattedChangePercent = (Number(changePercent) * 100).toFixed(2);
 		return (
-			<div className={`stock-stat ${change < 0 ? "decrease" : "increase"}`}>
-				{change < 0 && "-"}${change < 0 && String(change).slice(1)} (
-				{(Number(changePercent) * 100).toFixed(2)}%)
+			<div className={changeStyle}>
+				{changePrefix}${formattedChange} ({formattedChangePercent}%)
 			</div>
 		);
 	}
@@ -66,14 +68,9 @@ export default function Stock({
 	return (
 		<div className="stock-card">
 			<Row className="mb-2">
-				<Col md={4}>
-					<span className="stock-header">
-						{companyName} ({symbol}){" "}
-					</span>
-				</Col>
-				<Col md={4}>
+				<Col>
 					<Button
-						disabled={isUSMarketOpen}
+						disabled={!isUSMarketOpen}
 						size="sm"
 						variant="success"
 						onClick={handleShow}
@@ -84,13 +81,19 @@ export default function Stock({
 						{!isUSMarketOpen && " Market is closed."}
 					</span>
 				</Col>
-				<Col md={4} className="align-right">
+				<Col className="align-right">
 					<Button size="sm" variant="secondary" onClick={handleWatchlist}>
 						{isWatched ? "Remove from " : "Add to "} Watchlist
 					</Button>
 				</Col>
 			</Row>
 			<Row className="mb-2">
+				<Col md={6}>
+					<div className="stock-stat-header">Company</div>
+					<span className="stock-header">
+						{companyName} ({symbol}){" "}
+					</span>
+				</Col>
 				<Col>
 					<div className="stock-stat-header">Price</div>
 					<div className="stock-stat">${latestPrice}</div>
@@ -98,6 +101,23 @@ export default function Stock({
 				<Col>
 					<div className="stock-stat-header">Todays's Change</div>
 					{displayTodaysChange()}
+				</Col>
+			</Row>
+			<Row className="mb-2">
+				<Col>
+					<div className="stock-stat-header">
+						Ask Price{" "}
+						<OverlayTrigger placement="bottom" overlay={askPricePopover}>
+							<img
+								src={require("../../images/info.png")}
+								alt="info"
+								width={"17px"}
+							/>
+						</OverlayTrigger>
+					</div>
+					<div className="stock-stat-secondary">
+						{iexAskPrice !== 0 ? iexAskPrice : "-"}
+					</div>
 				</Col>
 				<Col>
 					<div className="stock-stat-header">
@@ -110,27 +130,10 @@ export default function Stock({
 							/>
 						</OverlayTrigger>
 					</div>
-					<div className="stock-stat">
+					<div className="stock-stat-secondary">
 						{iexBidPrice !== 0 ? iexBidPrice : "-"}
 					</div>
 				</Col>
-				<Col>
-					<div className="stock-stat-header">
-						Ask Price{" "}
-						<OverlayTrigger placement="bottom" overlay={askPricePopover}>
-							<img
-								src={require("../../images/info.png")}
-								alt="info"
-								width={"17px"}
-							/>
-						</OverlayTrigger>
-					</div>
-					<div className="stock-stat">
-						{iexAskPrice !== 0 ? iexAskPrice : "-"}
-					</div>
-				</Col>
-			</Row>
-			<Row className="mb-2">
 				<Col>
 					<div className="stock-stat-header">Open Price</div>
 					<div className="stock-stat-secondary">${iexOpen}</div>
@@ -144,12 +147,6 @@ export default function Stock({
 				<Col>
 					<div className="stock-stat-header">Previous Close</div>
 					<div className="stock-stat-secondary">${previousClose}</div>
-				</Col>
-				<Col>
-					<div className="stock-stat-header">Day High/Low</div>
-					<div className="stock-stat-secondary">
-						${high} / ${low}
-					</div>
 				</Col>
 				<Col>
 					<div className="stock-stat-header">52-Week High/Low</div>
