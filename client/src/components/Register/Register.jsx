@@ -22,7 +22,7 @@ const registerSchema = yup.object().shape({
 });
 
 export default function Register({ setIsRegistering }) {
-	const { onRegister, authError, setAuthError } = useAuth();
+	const { handleRegister, authError, setAuthError } = useAuth();
 	return (
 		<Card className="login-card">
 			<Card.Body>
@@ -30,7 +30,7 @@ export default function Register({ setIsRegistering }) {
 				<div className="error">{authError}</div>
 				<Formik
 					validationSchema={registerSchema}
-					onSubmit={(formData) => onRegister(formData)}
+					onSubmit={(formData) => handleRegister(formData)}
 					initialValues={{
 						email: "",
 						password: "",

@@ -1,4 +1,6 @@
-from database import db
+from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy()
 
 class Account(db.Model):
 	id = db.Column(db.String, primary_key=True)
@@ -22,7 +24,7 @@ class Transactions(db.Model):
 	shares = db.Column(db.Float, nullable=False)
 	price = db.Column(db.Float, nullable=False)
 
-class Values(db.Model):
+class DailyTotals(db.Model):
 	id = db.Column(db.Integer, db.Identity(start=1, cycle=True), primary_key=True)
 	account_number = db.Column(db.String, nullable=False)
 	date = db.Column(db.String, nullable=False)

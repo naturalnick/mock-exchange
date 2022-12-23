@@ -10,7 +10,7 @@ export default function SearchBar({ setStock }) {
 	const [input, setInput] = useState("");
 	const [stockList, setStocklist] = useState([]);
 	const [suggestions, setSuggestions] = useState([]);
-	const [isSearching, setIsSearching] = useState(true);
+	const [isSearching, setIsSearching] = useState(false);
 	const [error, setError] = useState("");
 
 	const getSuggestions = useCallback(() => {

@@ -2,7 +2,9 @@ import axios from "axios";
 
 export async function getAccount(token) {
 	const response = await axios
-		.get(`http://127.0.0.1:5001/api/account/info?token=${token}`)
+		.get("http://127.0.0.1:5001/api/account/info", {
+			headers: { Authorization: `token ${token}` },
+		})
 		.catch((error) => {
 			if (error.message === "Network Error") {
 				return { error: "Server connection failed." };
@@ -15,7 +17,9 @@ export async function getAccount(token) {
 
 export async function getHoldings(token) {
 	const response = await axios
-		.get(`http://127.0.0.1:5001/api/account/holdings?token=${token}`)
+		.get("http://127.0.0.1:5001/api/account/holdings", {
+			headers: { Authorization: `token ${token}` },
+		})
 		.catch((error) => {
 			if (error.message === "Network Error") {
 				return { error: "Server connection failed." };
@@ -29,23 +33,8 @@ export async function getHoldings(token) {
 
 export async function getDailyTotals(token) {
 	const response = await axios
-		.get(`http://127.0.0.1:5001/api/account/values?token=${token}`)
-		.catch((error) => {
-			if (error.message === "Network Error") {
-				return { error: "Server connection failed." };
-			} else {
-				return { error: error.response.data.error };
-			}
-		});
-	return response.status === 200 ? response.data.values : response;
-}
-
-export async function toggleWatched(token, symbol, shouldWatch) {
-	const response = await axios
-		.post("http://127.0.0.1:5001/api/account/watchlist", {
-			token: token,
-			symbol: symbol,
-			shouldWatch: shouldWatch,
+		.get(`http://127.0.0.1:5001/api/account/totals`, {
+			headers: { Authorization: `token ${token}` },
 		})
 		.catch((error) => {
 			if (error.message === "Network Error") {
@@ -54,7 +43,28 @@ export async function toggleWatched(token, symbol, shouldWatch) {
 				return { error: error.response.data.error };
 			}
 		});
-	console.log(response);
+	return response.status === 200 ? response.data.totals : response;
+}
+
+export async function toggleWatched(token, symbol, shouldWatch) {
+	const response = await axios
+		.post(
+			"http://127.0.0.1:5001/api/account/watchlist",
+			{
+				symbol: symbol,
+				shouldWatch: shouldWatch,
+			},
+			{
+				headers: { Authorization: `token ${token}` },
+			}
+		)
+		.catch((error) => {
+			if (error.message === "Network Error") {
+				return { error: "Server connection failed." };
+			} else {
+				return { error: error.response.data.error };
+			}
+		});
 	return response.status === 200 ? response.data.holdings : response;
 }
 
@@ -88,7 +98,9 @@ export async function getStockList() {
 
 export async function getTransactions(token) {
 	const response = await axios
-		.get(`http://127.0.0.1:5001/api/account/transactions?token=${token}`)
+		.get("http://127.0.0.1:5001/api/account/transactions", {
+			headers: { Authorization: `token ${token}` },
+		})
 		.catch((error) => {
 			if (error.message === "Network Error") {
 				return { error: "Server connection failed." };

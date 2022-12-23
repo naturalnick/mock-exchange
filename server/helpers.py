@@ -2,6 +2,7 @@ import random
 import jwt
 from dotenv import load_dotenv
 import os
+import iex
 
 load_dotenv()
 
@@ -24,3 +25,11 @@ def decode_token(token):
 	else:
 		return decoded
 
+
+def get_account_market_value(holdings):
+	market_value_total = 0
+	for holding in holdings:
+		stock_data = iex.get_stock_data(holding["symbol"])
+		share_market_value = stock_data["latestPrice"]
+		market_value_total = market_value_total + (share_market_value * holding["quantity"])
+	return market_value_total

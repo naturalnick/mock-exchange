@@ -10,7 +10,7 @@ export default function Login({ setIsRegistering }) {
 	const [password, setPassword] = useState("");
 	const [validated, setValidated] = useState(false);
 
-	const { onLogin, authError, setAuthError } = useAuth();
+	const { handleLogin, authError, setAuthError } = useAuth();
 
 	function handleSubmit(event) {
 		event.preventDefault();
@@ -20,7 +20,7 @@ export default function Login({ setIsRegistering }) {
 
 		const form = event.currentTarget;
 		if (form.checkValidity() === true) {
-			onLogin(email, password);
+			handleLogin(email, password);
 		}
 	}
 

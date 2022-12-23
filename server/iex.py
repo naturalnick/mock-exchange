@@ -12,7 +12,7 @@ def get_iex_api_url(symbol):
 	stock_symbol = symbol
 	iex_endpoint_path = f"stable/stock/{stock_symbol}/quote"
 
-	iex_filter = "symbol, companyName, change, changePercent,latestPrice,high,low,iexAskPrice,iexBidPrice,previousClose,iexOpen,iexClose,week52High,week52Low,isUSMarketOpen"
+	iex_filter = "symbol, companyName, change, changePercent,latestPrice,iexAskPrice,iexBidPrice,previousClose,iexOpen,iexClose,week52High,week52Low,isUSMarketOpen"
 	iex_query_params = f"?token={iex_token}&filter={iex_filter}"
 
 	return f"{iex_base_url}{iex_endpoint_path}{iex_query_params}"

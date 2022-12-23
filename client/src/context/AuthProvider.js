@@ -61,9 +61,9 @@ export function AuthProvider({ children }) {
 		<AuthContext.Provider
 			value={{
 				token,
-				onLogin: handleLogin,
-				onLogout: handleLogout,
-				onRegister: handleRegister,
+				handleLogin,
+				handleLogout,
+				handleRegister,
 				authError,
 				setAuthError,
 			}}
@@ -76,17 +76,17 @@ export function AuthProvider({ children }) {
 export function useAuth() {
 	const {
 		token,
-		onLogin: handleLogin,
-		onLogout: handleLogout,
-		onRegister: handleRegister,
+		handleLogin,
+		handleLogout,
+		handleRegister,
 		authError,
 		setAuthError,
 	} = useContext(AuthContext);
 	return {
 		token,
-		onLogin: handleLogin,
-		onLogout: handleLogout,
-		onRegister: handleRegister,
+		handleLogin,
+		handleLogout,
+		handleRegister,
 		authError,
 		setAuthError,
 	};

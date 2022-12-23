@@ -11,7 +11,7 @@ import { getAccount, getHoldings, getStockData } from "../utils/API";
 const AccountContext = createContext();
 
 function AccountProvider({ children }) {
-	const { token } = useAuth();
+	const { token, handleLogout } = useAuth();
 	const [accountNumber, setAccountNumber] = useState(0);
 	const [cashBalance, setCashBalance] = useState(0);
 	const [holdings, setHoldings] = useState([]);
@@ -21,7 +21,9 @@ function AccountProvider({ children }) {
 	const updateAccountInfo = useCallback(async () => {
 		setIsAccountLoading(true);
 		const account = await getAccount(token);
-
+		if ("error" in account) {
+			if (account.error === "invalid token") handleLogout();
+		}
 		setAccountNumber(Number(account.account_number));
 		setCashBalance(Number(account.balance));
 		updateWatchlist(
@@ -30,11 +32,13 @@ function AccountProvider({ children }) {
 				.filter((item) => item !== "" && item !== "[]")
 			//TODO fix bug where emtpy array is saved to the watchlist when it's initially empty
 		);
-	}, [token]);
+	}, [token, handleLogout]);
 
 	const updateAccountHoldings = useCallback(async () => {
 		const holdings = await getHoldings(token);
-
+		if (!holdings.length && "error" in holdings) {
+			if (holdings.error === "invalid token") handleLogout();
+		}
 		for (let i = 0; i < holdings.length; i++) {
 			const stockData = await getStockData(holdings[i].symbol);
 
@@ -45,7 +49,7 @@ function AccountProvider({ children }) {
 
 		setHoldings(holdings);
 		setIsAccountLoading(false);
-	}, [token]);
+	}, [token, handleLogout]);
 
 	useEffect(() => {
 		updateAccountInfo();
