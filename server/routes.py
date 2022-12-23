@@ -70,10 +70,12 @@ def account_info():
 def account_watchlist():
 	token = request.headers.get("Authorization").replace("token ", "")
 	email = decode_token(token)["email"]
-	print(email)
-	if email is None: return {"error": "invalid token"}, 401
+
+	if email is None:
+		return {"error": "invalid token"}, 401
+		
 	data = request.json
-	update_watchlist(email, data["symbol"], watch=data["shouldWatch"])
+	update_watchlist(email, data["symbol"])
 
 	return {"Success": "Watchlist updated."}, 200
 

@@ -34,6 +34,7 @@ export default function Stock({
 	const handleShow = () => setShowTradeModal(true);
 
 	useEffect(() => {
+		setIsWatched(false);
 		for (let i = 0; i < Object.keys(watchList).length; i++) {
 			if (watchList[i].symbol === symbol) {
 				setIsWatched(true);
