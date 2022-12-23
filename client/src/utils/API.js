@@ -52,7 +52,6 @@ export async function toggleWatched(token, symbol, shouldWatch) {
 			"http://127.0.0.1:5001/api/account/watchlist",
 			{
 				symbol: symbol,
-				shouldWatch: shouldWatch,
 			},
 			{
 				headers: { Authorization: `token ${token}` },

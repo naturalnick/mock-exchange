@@ -9,14 +9,15 @@ import os
 password_key = os.getenv("PASSWORD_KEY").encode("utf-8")
 fernet = Fernet(password_key)
 
-def update_watchlist(email, symbol, watch=True):
+def update_watchlist(email, symbol):
 	account = db.session.query(Account).filter(Account.email == email).first()
 
 	watch_list = account.watch_list.split(" ")
-	if (watch != True):
+	if symbol in watch_list:
 		watch_list.remove(symbol)
 	else:
 		watch_list.append(symbol)
+	
 	watch_list.sort()
 	db.session.query(Account).filter(Account.email == email).update({"watch_list": " ".join(watch_list)})
 	db.session.commit()
