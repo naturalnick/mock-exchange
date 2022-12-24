@@ -3,7 +3,6 @@ from flask_cors import CORS
 from threading import Thread
 import os
 from dotenv import load_dotenv
-from database import daily_totals
 
 load_dotenv()
 
@@ -26,7 +25,10 @@ def create_app():
 
 app = create_app()
 
-Thread(target=daily_totals, daemon=True).start()
-
 if __name__ == "__main__":
 	app.run(debug=True,port=5001)
+
+
+def post_worker_init(worker):
+	from database import daily_totals
+	Thread(target=daily_totals, daemon=True).start()
