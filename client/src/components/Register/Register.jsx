@@ -7,10 +7,7 @@ import { useAuth } from "../../context/AuthProvider";
 import "./Register.css";
 
 const registerSchema = yup.object().shape({
-	email: yup
-		.string()
-		.email("Not a valid email.")
-		.required("Email is required."),
+	email: yup.string().required("Email is required."),
 	password: yup
 		.string()
 		.min(4, "Must be 4 or more characters")
