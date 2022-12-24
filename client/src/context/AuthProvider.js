@@ -1,7 +1,7 @@
 import { useState, createContext, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { useCookies } from "react-cookie";
+import { loginAccount, registerAccount } from "../utils/API";
 
 const AuthContext = createContext(null);
 
@@ -13,23 +13,27 @@ export function AuthProvider({ children }) {
 	const [authError, setAuthError] = useState("");
 
 	async function handleLogin(email, password) {
-		const response = await axios
-			.post("http://127.0.0.1:5001/login", {
-				email: email,
-				password: password,
-			})
-			.catch((error) => {
-				if (error.message === "Network Error") {
-					setAuthError("Server connection failed.");
-				} else {
-					setAuthError(error.response.data.error);
-				}
-			});
+		const response = await loginAccount(email, password);
 
-		if (response && response.status === 200) {
-			setToken(response.data.token);
-			setCookie("token", response.data.token, { path: "/" });
+		if ("error" in response) {
+			setAuthError(response.error);
+		}
+		if ("token" in response) {
+			setToken(response.token);
+			setCookie("token", response.token, { path: "/" });
+			navigate("/dashboard");
+		}
+	}
 
+	async function handleRegister(formData) {
+		const response = await registerAccount(formData.email, formData.password);
+
+		if ("error" in response) {
+			setAuthError(response.error);
+		}
+		if ("token" in response) {
+			setToken(response.token);
+			setCookie("token", response.token, { path: "/" });
 			navigate("/dashboard");
 		}
 	}
@@ -37,24 +41,6 @@ export function AuthProvider({ children }) {
 	function handleLogout() {
 		setToken(null);
 		removeCookie("token");
-	}
-
-	async function handleRegister(formData) {
-		const response = await axios
-			.post("http://127.0.0.1:5001/register", {
-				email: formData.email,
-				password: formData.password,
-			})
-			.catch((error) => {
-				if (error.message === "Network Error") {
-					setAuthError("Server connection failed.");
-				} else {
-					setAuthError(error.response.data.error);
-				}
-			});
-		if (response && response.status === 200) {
-			handleLogin(formData.email, formData.password);
-		}
 	}
 
 	return (

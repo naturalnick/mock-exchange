@@ -1,6 +1,7 @@
 from cryptography.fernet import Fernet
 from models import db, Account, Holdings, Transactions, DailyTotals, StockReference
-from helpers import *
+from helpers import generate_account_id, get_account_market_value
+import iex
 from datetime import datetime, date
 import time
 import pytz
@@ -135,6 +136,7 @@ def set_account_totals(date):
 
 	db.session.commit()
 
+
 def get_stock_list():
 	stock_list = []
 	for entry in db.session.query(StockReference).all():
@@ -163,12 +165,12 @@ def daily_totals():
 
 		if current_hour < us_market_closing_hour_utc:
 			sleeping_seconds = (us_market_closing_hour_utc - current_hour) * 3600
-			print(f"Server status check. Date: {today}, Hour: {current_hour}/24 (UTC). Market is still open, waiting {sleeping_seconds/3600} hours to check again")
+			message = f"Waiting {sleeping_seconds/3600} hours to check again."
 		elif check_daily_total_logged(today) is False:
-			print(f"Server status check. Date: {today}, Hour: {current_hour}/24 (UTC). Market is now closed, assigning account totals, next check in {sleeping_seconds/3600} hours.")
+			message = f"Assigning account totals, next check in {sleeping_seconds/3600} hours."
 			set_account_totals(today)
 		else:
-			sleeping_seconds = sleeping_seconds * 3
-			print(f"Server status check. Date: {today}, Hour: {current_hour}/24 (UTC). Totals have already been assigned today. Next check in {sleeping_seconds/3600} hours. ")
-			
+			message = f"Totals have already been assigned today. Next check in {sleeping_seconds/3600} hours."
+
+		print(f"Server status check. Date: {today}, Hour: {current_hour}/24 (UTC). {message}")
 		time.sleep(sleeping_seconds)

@@ -1,13 +1,18 @@
 from flask import Blueprint, request
-from database import check_email_exists, get_account, generate_token, create_account, get_stock_list, get_account_holdings, get_account_daily_totals, modify_holdings, adjust_balance, log_transaction, get_account_transactions, update_watchlist, check_credentials
-from helpers import decode_token
+from database import check_email_exists, get_account, create_account, get_stock_list, get_account_holdings, get_account_daily_totals, modify_holdings, adjust_balance, log_transaction, get_account_transactions, update_watchlist, check_credentials
+from helpers import decode_token, generate_token
 import iex
 
-blueprint = Blueprint("blueprint", __name__)
+blueprint = Blueprint("blueprint", __name__, static_folder="../client/build", static_url_path="")
 
 @blueprint.route("/")
 def index():
-	return "Hello"
+	return blueprint.send_static_file("index.html"), 200
+
+
+@blueprint.errorhandler(404)
+def not_found(e):
+	return blueprint.send_static_file("index.html"), 200
 
 
 @blueprint.route("/login", methods=["POST"])
