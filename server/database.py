@@ -138,6 +138,7 @@ def set_account_totals(date):
 
 
 def get_stock_list():
+	update_stock_list()
 	stock_list = []
 	for entry in db.session.query(StockReference).all():
 		stock = entry.__dict__
