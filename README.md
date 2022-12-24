@@ -52,7 +52,8 @@ Screenshot:<br>
 
 1. Create a PostgreSQL database and have your username, password and database name ready
 2. Sign up for a free trial at https://iexcloud.io to get an API access token
-3. At the command line in the root directory run "bash setup.sh".
+3. At the command line in the root directory run "bash setup.sh". When it's finished if everything was entered correctly, your server should be online. If you need to modify credentials edit the .env file found in the server directory.
+4. Open a new command line and at the root directory run "cd client && npm start". This should launch the client in your browser or navigate to the URL provided in the terminal.
 
 ## Author
 
