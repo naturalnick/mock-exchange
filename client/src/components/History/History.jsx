@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from "react";
 import Table from "react-bootstrap/Table";
 import { useAuth } from "../../context/AuthProvider";
 import { getTransactions } from "../../utils/API";
-import { formatDate } from "../../utils/Utils";
 import "./History.css";
 import HistoryRow from "./HistoryRow";
 

@@ -6,7 +6,7 @@ import { useAuth } from "../../context/AuthProvider";
 import "./Director.css";
 
 export default function Director() {
-	const { token, onLogout } = useAuth();
+	const { token, handleLogout } = useAuth();
 	const currentPage = useLocation();
 
 	return (
@@ -50,7 +50,7 @@ export default function Director() {
 										Account
 									</Link>
 									<Link
-										onClick={onLogout}
+										onClick={handleLogout}
 										className="d-nav-item logout"
 									>
 										Log Out

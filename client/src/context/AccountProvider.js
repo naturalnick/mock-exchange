@@ -33,7 +33,7 @@ function AccountProvider({ children }) {
 			//TODO fix bug where emtpy array is saved to the watchlist when it's initially empty
 		);
 	}, [token, handleLogout]);
-	console.log(watchList);
+
 	const updateAccountHoldings = useCallback(async () => {
 		const holdings = await getHoldings(token);
 		if (!holdings.length && "error" in holdings) {

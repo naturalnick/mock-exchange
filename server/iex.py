@@ -6,7 +6,7 @@ load_dotenv()
 
 iex_token = os.getenv("IEX_TOKEN")
 
-def get_iex_api_url(symbol):
+def get_stock_quote_url(symbol):
 	iex_base_url = f"https://cloud.iex.cloud/"
 
 	stock_symbol = symbol
@@ -20,15 +20,17 @@ def get_iex_api_url(symbol):
 
 def get_stock_data(symbol):
 	try:
-		iex_api_call = get_iex_api_url(symbol)
+		iex_api_call = get_stock_quote_url(symbol)
 		response = requests.get(iex_api_call)
 		return response.json()
 	except:
 		print("Request error.")
 		return None
 
+
 def get_stock_list():
-	response = requests.get(f"https://cloud.iexapis.com/beta/ref-data/symbols?token={iex_token}")
+	stock_ref_url = "https://cloud.iexapis.com/beta/ref-data/symbols?token="
+	response = requests.get(f"{stock_ref_url}{iex_token}")
 	data = response.json()
 	stock_list = []
 	for item in data:
