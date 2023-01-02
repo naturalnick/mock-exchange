@@ -20,15 +20,13 @@ def create_app():
 
 		from routes import blueprint
 		app.register_blueprint(blueprint)
-		
+
+		from database import daily_totals
+		Thread(target=daily_totals, daemon=True).start()
+
 		return app
 
 app = create_app()
 
 if __name__ == "__main__":
 	app.run(debug=True,port=5001)
-
-
-def post_worker_init(worker):
-	from database import daily_totals
-	Thread(target=daily_totals, daemon=True).start()

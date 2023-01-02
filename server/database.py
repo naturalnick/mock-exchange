@@ -99,27 +99,21 @@ def check_daily_total_logged(date):
 
 
 def get_account_holdings(account_number):
-	entries = db.session.query(Holdings).filter(Holdings.account_number == account_number).all()
-	holdings = []
-	for entry in entries:
-		holdings.append({"id": entry.id, "symbol": entry.symbol, "quantity": entry.shares, "base_cost":entry.base_cost})
-	return holdings
+	query = db.session.query(Holdings).filter(Holdings.account_number == account_number).all()
+	if query is None: return None
+	return [{"id": q.id, "symbol": q.symbol, "quantity": q.shares, "base_cost":q.base_cost} for q in query]
 
 
 def get_account_daily_totals(account_number):
-	entries = db.session.query(DailyTotals).filter(DailyTotals.account_number == account_number).order_by(DailyTotals.date).all()
-	totals = []
-	for entry in entries:
-		totals.append({"date": entry.date, "value": entry.value})
-	return totals
+	query = db.session.query(DailyTotals).filter(DailyTotals.account_number == account_number).order_by(DailyTotals.date).all()
+	if query is None: return None
+	return [{"date": q.date, "value": q.value} for q in query]
 	
 
 def get_account_transactions(account_number):
-	entries = db.session.query(Transactions).filter(Transactions.account_number == account_number).all()
-	transactions = []
-	for entry in entries:
-		transactions.append({"id": entry.id, "date": entry.date, "symbol": entry.symbol, "quantity": entry.shares, "price":entry.price})
-	return transactions
+	query = db.session.query(Transactions).filter(Transactions.account_number == account_number).all()
+	if query is None: return None
+	return [{"id": q.id, "date": q.date, "symbol": q.symbol, "quantity": q.shares, "price": q.price} for q in query]
 
 
 def set_account_totals(date):
@@ -138,18 +132,13 @@ def set_account_totals(date):
 
 
 def get_stock_list():
-	update_stock_list()
-	stock_list = []
-	for entry in db.session.query(StockReference).all():
-		stock = entry.__dict__
-		del stock["_sa_instance_state"]
-		stock_list.append(stock)
-	return stock_list
+	query = db.session.query(StockReference).all()
+	return [{"id": q.id, "symbol": q.symbol, "company_name": q.company_name} for q in query]
 
 
-def update_stock_list():
-	entry = db.session.query(StockReference).first()
-	if entry is None: # only run once to save the list
+def init_stock_list():
+	query = db.session.query(StockReference).first()
+	if query is None: # only runs once to save the list
 		stock_list = iex.get_stock_list()
 		for stock in stock_list:
 			newRef = StockReference(symbol=stock["symbol"], company_name=stock["company_name"])
@@ -158,6 +147,7 @@ def update_stock_list():
 
 
 def daily_totals():
+	init_stock_list()
 	while(True):
 		today = str(date.today())
 		current_hour = int(datetime.now().astimezone(pytz.utc).strftime("%H"))
