@@ -20,7 +20,7 @@ export default function Account() {
 					</Card.Text>
 					<Card.Text>Email: {jwt_decode(token).email}</Card.Text>
 				</Card.Body>
-				<Card.Header>Actions</Card.Header>
+				{/* <Card.Header>Actions</Card.Header>
 				<Card.Body>
 					<Card.Link onClick={() => console.log("change password")}>
 						Change Password
@@ -31,7 +31,7 @@ export default function Account() {
 					>
 						Delete Account
 					</Card.Link>
-				</Card.Body>
+				</Card.Body> */}
 			</Card>
 			<History />
 		</div>

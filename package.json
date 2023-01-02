@@ -1,0 +1,9 @@
+{
+	"name": "mock-exchange",
+	"version": "1.0.0",
+	"main": "",
+	"scripts": {
+		"heroku-prebuild": "npm install",
+		"heroku-postbuild": "cd client && npm install && npm run build"
+	}
+}
