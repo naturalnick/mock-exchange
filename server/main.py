@@ -21,8 +21,8 @@ def create_app():
 		from routes import blueprint
 		app.register_blueprint(blueprint)
 
-		from database import daily_totals
-		Thread(target=daily_totals, daemon=True).start()
+		# from database import daily_totals
+		# Thread(target=daily_totals, daemon=True).start()
 
 		return app
 
