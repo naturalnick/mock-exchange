@@ -8,7 +8,7 @@ Logged in users are provided an initial fake $100,000 of which can be invested i
 
 <br>
 
-See it in action [here](https://mockex.onrender.com). (Render may cause a delay in loading.)
+See it in action [here](https://mockex.herokuapp.com). (Heroku hosting may result in loading delay.)
 
 <br>
 
