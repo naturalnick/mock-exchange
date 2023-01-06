@@ -4,7 +4,12 @@ set -o errexit
 
 echo "Starting app setup... Ctrl-C to exit"
 
-cd server
+### CLIENT SETUP
+cd client
+npm i --prefix
+npm run build --prefix
+
+cd ../server
 
 touch .env
 
@@ -23,11 +28,11 @@ while true; do
 	test "$password" != "" && break
 done
 
-echo "Enter your PostgreSQL tablename (default is postgres):"
-read tablename
-tablename=${tablename:="postgres"}
+echo "Enter your PostgreSQL database name (default is postgres):"
+read dbname
+dbname=${dbname:="postgres"}
 
-echo "DB_CONFIG = 'postgresql+psycopg2://$username:$password@$host/$tablename'" >> .env
+echo "DB_CONFIG = 'postgresql+psycopg2://$username:$password@$host/$dbname'" >> .env
 
 ### SECRET KEY SETUP
 
@@ -54,4 +59,6 @@ echo "PASSWORD_KEY = '$password_key'" >> .env
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
+
+### LAUNCH SERVER
 python main.py
