@@ -1,12 +1,13 @@
 from flask import Blueprint, request
-from database import check_email_exists, get_account, create_account, get_stock_list, get_account_holdings, get_account_daily_totals, modify_holdings, adjust_balance, log_transaction, get_account_transactions, update_watchlist, check_credentials
+from database import check_email_exists, get_account, create_account, get_account_holdings, get_account_daily_totals, modify_holdings, adjust_balance, log_transaction, get_account_transactions, update_watchlist, check_credentials
 from helpers import decode_token, generate_token
-import iex
+import api
 
 blueprint = Blueprint("blueprint", __name__, static_folder="../client/build", static_url_path="")
 
 @blueprint.route("/")
 def index():
+	print(api.search_stocks("apple"))
 	return blueprint.send_static_file("index.html"), 200
 
 
@@ -41,23 +42,22 @@ def register_user():
 	return {"token": generate_token(email)}, 200
 
 
-@blueprint.route("/api/stock", methods=["GET"])
+@blueprint.route("/api/stock/quote", methods=["GET"])
 def get_stock():
 	stock_symbol = request.args.get("symbol")
 
-	data = iex.get_stock_data(stock_symbol)
+	data = api.get_stock_data(stock_symbol)
 	if data is None:
 		return {"error": "Stock not found."}, 404
 	return data, 200
 
 
-@blueprint.route("/api/stock_list", methods=["GET"])
-def get_stock_reference():
-
-	stocks = get_stock_list()
-	if stocks is None:
-		return {"error": "Stock not found."}, 404
-	return stocks, 200
+@blueprint.route("/api/stock/search", methods=["GET"])
+def get_stocks():
+	query = request.args.get("query")
+	stocks = api.search_stocks(query)
+	if stocks is not None: return stocks, 200
+	return {"error": "Stock not found."}, 404
 
 
 @blueprint.route("/api/account/info", methods=["GET"])

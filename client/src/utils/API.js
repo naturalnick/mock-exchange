@@ -101,7 +101,7 @@ export async function toggleWatched(token, symbol, shouldWatch) {
 
 export async function getStockData(symbol) {
 	const response = await axios
-		.get(`/api/stock?symbol=${symbol}`)
+		.get(`/api/stock/quote?symbol=${symbol}`)
 		.catch((error) => {
 			if (error.message === "Network Error") {
 				return { error: "Server connection failed." };
@@ -113,14 +113,16 @@ export async function getStockData(symbol) {
 	return response.status === 200 ? response.data : response;
 }
 
-export async function getStockList() {
-	const response = await axios.get("/api/stock_list").catch((error) => {
-		if (error.message === "Network Error") {
-			return { error: "Server connection failed." };
-		} else {
-			return { error: error.response.data.error };
-		}
-	});
+export async function searchStocks(query) {
+	const response = await axios
+		.get(`/api/stock/search?query=${query}`)
+		.catch((error) => {
+			if (error.message === "Network Error") {
+				return { error: "Server connection failed." };
+			} else {
+				return { error: error.response.data.error };
+			}
+		});
 
 	return response.status === 200 ? response.data : response;
 }

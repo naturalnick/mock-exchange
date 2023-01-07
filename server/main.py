@@ -15,7 +15,7 @@ def create_app():
 	db.init_app(app)
 
 	with app.app_context():
-		from models import Account, Holdings, Transactions, DailyTotals, StockReference
+		from models import Account, Holdings, Transactions, DailyTotals
 		db.create_all()
 
 		from routes import blueprint
