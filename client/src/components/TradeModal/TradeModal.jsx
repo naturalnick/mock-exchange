@@ -147,12 +147,12 @@ export default function TradeModal({
 										{shareHolding > 0 && (
 											<Button
 												variant="outline-secondary"
-												onClick={() =>
+												onClick={() => {
 													setValues({
 														...values,
 														quantity: shareHolding,
-													})
-												}
+													});
+												}}
 											>
 												Sell All
 											</Button>

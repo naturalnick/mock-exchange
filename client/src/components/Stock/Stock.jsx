@@ -1,29 +1,23 @@
 import { useState, useEffect } from "react";
 import Col from "react-bootstrap/esm/Col";
 import Row from "react-bootstrap/esm/Row";
-import "./Stock.css";
 import Button from "react-bootstrap/esm/Button";
-import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import { askPricePopover, bidPricePopover } from "../Popovers/Popovers";
 import TradeModal from "../TradeModal/TradeModal";
 import { useAuth } from "../../context/AuthProvider";
 import { useAccount } from "../../context/AccountProvider";
 import { toggleWatched } from "../../utils/API";
+import "./Stock.css";
 
 export default function Stock({
 	symbol,
 	companyName,
 	latestPrice,
-	iexAskPrice,
-	iexBidPrice,
 	change,
 	changePercent,
-	iexOpen,
-	iexClose,
+	open,
+	high,
+	low,
 	previousClose,
-	week52High,
-	week52Low,
-	isUSMarketOpen,
 }) {
 	const { token } = useAuth();
 	const { updateAccountInfo, watchList } = useAccount();
@@ -70,31 +64,20 @@ export default function Stock({
 		<div className="stock-card">
 			<Row className="mb-2">
 				<Col>
-					<Button
-						disabled={!isUSMarketOpen}
-						size="sm"
-						variant="success"
-						onClick={handleShow}
-					>
-						Trade
-					</Button>
-					<span className="closed">
-						{!isUSMarketOpen && " Market is closed."}
+					<span className="stock-header">
+						{companyName} ({symbol}){" "}
 					</span>
 				</Col>
-				<Col className="align-right">
+				<Col md={6} className="align-right">
+					<Button size="sm" variant="success" onClick={handleShow}>
+						Trade
+					</Button>{" "}
 					<Button size="sm" variant="secondary" onClick={handleWatchlist}>
 						{isWatched ? "Remove from " : "Add to "} Watchlist
 					</Button>
 				</Col>
 			</Row>
 			<Row className="mb-2">
-				<Col md={6}>
-					<div className="stock-stat-header">Company</div>
-					<span className="stock-header">
-						{companyName} ({symbol}){" "}
-					</span>
-				</Col>
 				<Col>
 					<div className="stock-stat-header">Price</div>
 					<div className="stock-stat">${latestPrice}</div>
@@ -106,61 +89,24 @@ export default function Stock({
 			</Row>
 			<Row className="mb-2">
 				<Col>
-					<div className="stock-stat-header">
-						Ask Price{" "}
-						<OverlayTrigger placement="bottom" overlay={askPricePopover}>
-							<img
-								src={require("../../images/info.png")}
-								alt="info"
-								width={"17px"}
-							/>
-						</OverlayTrigger>
-					</div>
-					<div className="stock-stat-secondary">
-						{iexAskPrice !== 0 ? iexAskPrice : "-"}
-					</div>
-				</Col>
-				<Col>
-					<div className="stock-stat-header">
-						Bid Price{" "}
-						<OverlayTrigger placement="bottom" overlay={bidPricePopover}>
-							<img
-								src={require("../../images/info.png")}
-								alt="info"
-								width={"17px"}
-							/>
-						</OverlayTrigger>
-					</div>
-					<div className="stock-stat-secondary">
-						{iexBidPrice !== 0 ? iexBidPrice : "-"}
-					</div>
-				</Col>
-				<Col>
 					<div className="stock-stat-header">Open Price</div>
-					<div className="stock-stat-secondary">${iexOpen}</div>
+					<div className="stock-stat-secondary">${open}</div>
 				</Col>
-				<Col>
-					<div className="stock-stat-header">Close Price</div>
-					<div className="stock-stat-secondary">
-						{isUSMarketOpen ? "-" : `$${iexClose}`}
-					</div>
-				</Col>
+
 				<Col>
 					<div className="stock-stat-header">Previous Close</div>
 					<div className="stock-stat-secondary">${previousClose}</div>
 				</Col>
 				<Col>
-					<div className="stock-stat-header">52-Week High/Low</div>
+					<div className="stock-stat-header">Day High/Low</div>
 					<div className="stock-stat-secondary">
-						${week52High} / ${week52Low}
+						${high}/${low}
 					</div>
 				</Col>
 			</Row>
 			<Row>
 				<Col>
-					<div className="stock-footer">
-						Quote as of {isUSMarketOpen ? dateTime : "market close."}
-					</div>
+					<div className="stock-footer">Quote as of {dateTime}</div>
 				</Col>
 			</Row>
 			<TradeModal
