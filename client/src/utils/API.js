@@ -141,3 +141,26 @@ export async function getTransactions(token) {
 		});
 	return response.status === 200 ? response.data.transactions : response;
 }
+
+export async function tradeStock(token, transaction) {
+	const response = await axios
+		.post(
+			"/api/trade",
+			{
+				symbol: transaction.symbol,
+				quantity: transaction.quantity,
+				cost_per_share: transaction.price,
+			},
+			{
+				headers: { Authorization: `token ${token}` },
+			}
+		)
+		.catch((error) => {
+			if (error.message === "Network Error") {
+				return { error: "Server connection failed." };
+			} else {
+				return { error: error.response.data.error };
+			}
+		});
+	return response;
+}

@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { Formik } from "formik";
 import * as yup from "yup";
 import Form from "react-bootstrap/Form";
@@ -12,6 +11,7 @@ import Select from "react-select";
 import { useAccount } from "../../context/AccountProvider";
 import { useAuth } from "../../context/AuthProvider";
 import "./TradeModal.css";
+import { tradeStock } from "../../utils/API";
 
 const schema = yup.object().shape({
 	action: yup.string().required("Action is required."),
@@ -55,16 +55,13 @@ export default function TradeModal({
 
 	async function handleTransaction(formData) {
 		if (cashBalance > total) {
-			const response = await axios.post("http://127.0.0.1:5001/api/trade", {
-				token: token,
-				symbol: symbol,
-				quantity:
-					formData.action === "sell"
-						? Number(formData.quantity) * -1
-						: formData.quantity,
-				cost_per_share: price,
-			});
-			if (response.status === 200) {
+			const quantity =
+				formData.action === "sell"
+					? Number(formData.quantity) * -1
+					: formData.quantity;
+			const response = await tradeStock(token, { symbol, price, quantity });
+
+			if ("error" in response === false) {
 				handleClose();
 				updateAccountInfo();
 				updateAccountHoldings();

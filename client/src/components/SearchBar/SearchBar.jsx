@@ -32,21 +32,9 @@ export default function SearchBar({ setStock }) {
 
 	function handleKeyDown(e) {
 		if (e.key === "Enter") {
-			handleQuote(input);
 		} else {
 			setIsSearching(true);
 			setStock({});
-		}
-	}
-
-	async function handleQuote(symbol) {
-		const stockData = await getStockData(symbol);
-
-		if ("error" in stockData) {
-			setError(stockData.error);
-		} else {
-			setStock(stockData);
-			setIsSearching(false);
 		}
 	}
 
@@ -66,12 +54,18 @@ export default function SearchBar({ setStock }) {
 		}
 	}
 
-	function handleSuggestionClicked(symbol) {
-		setInput("");
-		handleQuote(symbol);
+	async function handleSuggestionClicked(symbol) {
+		const stockData = await getStockData(symbol);
+		if ("error" in stockData) {
+			setError(stockData.error);
+		} else {
+			setStock(stockData);
+			setIsSearching(false);
+			setInput("");
+		}
 		setSuggestions([]);
 	}
-	console.log(isSearching);
+
 	return (
 		<div className="search-container">
 			<Form.Control
