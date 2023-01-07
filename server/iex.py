@@ -4,25 +4,17 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-iex_token = os.getenv("IEX_TOKEN")
-
-def get_stock_quote_url(symbol):
-	iex_base_url = f"https://cloud.iex.cloud/"
-
-	stock_symbol = symbol
-	iex_endpoint_path = f"stable/stock/{stock_symbol}/quote"
-
-	iex_filter = "symbol, companyName, change, changePercent,latestPrice,iexAskPrice,iexBidPrice,previousClose,iexOpen,iexClose,week52High,week52Low,isUSMarketOpen"
-	iex_query_params = f"?token={iex_token}&filter={iex_filter}"
-
-	return f"{iex_base_url}{iex_endpoint_path}{iex_query_params}"
-
+finnhub_token = os.getenv("FINNHUB_TOKEN")
 
 def get_stock_data(symbol):
 	try:
-		iex_api_call = get_stock_quote_url(symbol)
-		response = requests.get(iex_api_call)
-		return response.json()
+		res1 = requests.get(f"https://finnhub.io/api/v1/stock/profile2?symbol={symbol}&token={finnhub_token}")
+		data1 = res1.json()
+		company_name = {"companyName": data1["name"]}
+		res2 = requests.get(f"https://finnhub.io/api/v1/quote?symbol={symbol}&token={finnhub_token}")
+		data2 = res2.json()
+		stock_data = {"symbol": symbol, "latestPrice": data2["c"], "change": data2["d"], "changePercent": data2["dp"], "high": data2["h"], "low": data2["l"], "open": data2["o"], "previousClose": data2["pc"] }
+		return {**company_name, **stock_data}
 	except:
 		print("Request error.")
 		return None
