@@ -1,7 +1,7 @@
 from cryptography.fernet import Fernet
-from models import db, Account, Holdings, Transactions, DailyTotals, StockReference
+from models import db, Account, Holdings, Transactions, DailyTotals
 from helpers import generate_account_id, get_account_market_value
-import iex
+import api
 from datetime import datetime, date
 import time
 import pytz
@@ -131,23 +131,7 @@ def set_account_totals(date):
 	db.session.commit()
 
 
-def get_stock_list():
-	query = db.session.query(StockReference).all()
-	return [{"id": q.id, "symbol": q.symbol, "company_name": q.company_name} for q in query]
-
-
-def init_stock_list():
-	query = db.session.query(StockReference).first()
-	if query is None: # only runs once to save the list
-		stock_list = iex.get_stock_list()
-		for stock in stock_list:
-			newRef = StockReference(symbol=stock["symbol"], company_name=stock["company_name"])
-			db.session.add(newRef)
-		db.session.commit()
-
-
 def daily_totals():
-	init_stock_list()
 	while(True):
 		today = str(date.today())
 		current_hour = int(datetime.now().astimezone(pytz.utc).strftime("%H"))

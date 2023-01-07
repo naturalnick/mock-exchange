@@ -1,7 +1,24 @@
-export default function Suggestion({ symbol, company_name, handleClick }) {
+import Button from "react-bootstrap/esm/Button";
+import "./SearchBar.css";
+
+export default function Suggestion({
+	symbol,
+	name,
+	exchangeShortName,
+	handleClick,
+}) {
 	return (
-		<p style={{ cursor: "pointer" }} onClick={() => handleClick(symbol)}>
-			{symbol} {company_name}
-		</p>
+		<div className="suggestion" onClick={() => handleClick(symbol)}>
+			{symbol} - {name} - {exchangeShortName}
+			<Button
+				variant="primary"
+				size="sm"
+				id="button"
+				className="quote-btn"
+				onClick={() => handleClick(symbol)}
+			>
+				Quote
+			</Button>
+		</div>
 	);
 }

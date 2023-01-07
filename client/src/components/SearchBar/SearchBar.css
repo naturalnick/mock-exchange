@@ -2,12 +2,29 @@
 	position: relative;
 }
 
-.suggestions {
+.suggestion-container {
 	background-color: white;
 	color: rgb(91, 91, 91);
 	padding: 5px;
 	overflow-y: auto;
 	overflow-x: hidden;
 	max-height: 200px;
-	margin-top: -16px;
+	/* margin-top: -16px; */
+	margin: 0 5px;
+}
+
+.suggestion {
+	position: relative;
+	cursor: pointer;
+	padding: 5px 5px;
+}
+
+.suggestion:hover {
+	background-color: rgb(206, 206, 206);
+}
+
+.quote-btn {
+	position: absolute;
+	right: 0;
+	top: 0;
 }

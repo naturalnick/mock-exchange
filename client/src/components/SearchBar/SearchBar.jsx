@@ -1,56 +1,45 @@
 import { useEffect, useState, useCallback } from "react";
-import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import InputGroup from "react-bootstrap/InputGroup";
-import { getStockData, getStockList } from "../../utils/API";
+import { getStockData, searchStocks } from "../../utils/API";
 import Suggestion from "./Suggestion";
 import "./SearchBar.css";
 
 export default function SearchBar({ setStock }) {
 	const [input, setInput] = useState("");
-	const [stockList, setStocklist] = useState([]);
 	const [suggestions, setSuggestions] = useState([]);
 	const [isSearching, setIsSearching] = useState(false);
 	const [error, setError] = useState("");
 
-	const getSuggestions = useCallback(() => {
-		const query = input.toLowerCase();
-		const filteredStocks = stockList.filter((stock) => {
-			return (
-				stock.symbol.toLowerCase().includes(query) ||
-				stock.company_name.toLowerCase().includes(query)
-			);
-		});
-		if (filteredStocks.length > 0) {
-			setSuggestions(filteredStocks);
+	const getSuggestions = useCallback(async (query) => {
+		const queriedStocks = await searchStocks(query.toLowerCase());
+		console.log(queriedStocks);
+		if (queriedStocks.length > 0) {
+			setSuggestions(queriedStocks);
 		} else {
+			setSuggestions([]);
 			setError("No stocks found.");
-		}
-	}, [input, stockList]);
-
-	useEffect(() => {
-		loadStocklist();
-
-		async function loadStocklist() {
-			const response = await getStockList();
-			setStocklist(response);
 		}
 	}, []);
 
 	useEffect(() => {
-		if (input !== "") getSuggestions();
+		const delayTimer = setTimeout(() => {
+			if (input !== "") getSuggestions(input);
+			else setSuggestions([]);
+			setIsSearching(false);
+		}, 1000);
+		return () => clearTimeout(delayTimer);
 	}, [input, getSuggestions]);
 
 	function handleKeyDown(e) {
 		if (e.key === "Enter") {
-			handleSearch(input);
+			handleQuote(input);
 		} else {
 			setIsSearching(true);
 			setStock({});
 		}
 	}
 
-	async function handleSearch(symbol) {
+	async function handleQuote(symbol) {
 		const stockData = await getStockData(symbol);
 
 		if ("error" in stockData) {
@@ -62,49 +51,40 @@ export default function SearchBar({ setStock }) {
 	}
 
 	function displaySuggestions() {
-		return suggestions.length > 0 ? (
-			suggestions.map((suggestion) => {
+		if (suggestions.length > 0) {
+			return suggestions.map((suggestion) => {
 				return (
 					<Suggestion
 						key={suggestion.id}
 						{...suggestion}
-						handleClick={handleSuggestion}
+						handleClick={handleSuggestionClicked}
 					/>
 				);
-			})
-		) : (
-			<>{error}</>
-		);
+			});
+		} else if (!isSearching) {
+			return <>{error}</>;
+		}
 	}
 
-	function handleSuggestion(symbol) {
-		setInput(symbol);
-		handleSearch(symbol);
+	function handleSuggestionClicked(symbol) {
+		setInput("");
+		handleQuote(symbol);
 		setSuggestions([]);
 	}
-
+	console.log(isSearching);
 	return (
 		<div className="search-container">
-			<InputGroup className="mb-3">
-				<Form.Control
-					placeholder="Stock Symbol eg. AAPL"
-					aria-label="Stock Ticker Symbol"
-					aria-describedby="stock-ticker"
-					type="text"
-					value={input || ""}
-					onChange={(e) => setInput(e.target.value)}
-					onKeyDown={handleKeyDown}
-				/>
-				<Button
-					variant="primary"
-					id="button"
-					onClick={() => handleSearch(input)}
-				>
-					Search
-				</Button>
-			</InputGroup>
-			{isSearching && (
-				<div className="suggestions">{displaySuggestions()}</div>
+			<Form.Control
+				placeholder="Search by Ticker Symbol or Company Name"
+				aria-label="Stock Ticker Symbol"
+				aria-describedby="stock-ticker"
+				type="text"
+				value={input || ""}
+				onChange={(e) => setInput(e.target.value)}
+				onKeyDown={handleKeyDown}
+			/>
+			{!isSearching && input !== "" && (
+				<div className="suggestion-container">{displaySuggestions()}</div>
 			)}
 		</div>
 	);

@@ -52,7 +52,7 @@ export default function Stock({
 			change < 0 ? "stock-stat decrease" : "stock-stat increase";
 		const changePrefix = change < 0 ? "-" : "+";
 		const formattedChange = change < 0 ? String(change).slice(1) : change;
-		const formattedChangePercent = (Number(changePercent) * 100).toFixed(2);
+		const formattedChangePercent = Number(changePercent).toFixed(2);
 		return (
 			<div className={changeStyle}>
 				{changePrefix}${formattedChange} ({formattedChangePercent}%)
