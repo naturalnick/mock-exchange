@@ -126,11 +126,12 @@ def account_transactions():
 
 @blueprint.route("/api/trade", methods=["POST"])
 def trade():
-	transaction = request.json
-
-	token = transaction.pop("token")
+	token = request.headers.get("Authorization").replace("token ", "")
 	email = decode_token(token)["email"]
-	if email is None: return {"Error": "invalid token"}, 401
+
+	if decode_token(token) is None: return {"Error": "invalid token"}, 401
+
+	transaction = request.json
 
 	account = get_account(email)
 	transaction.update({"account_number": account.id})
