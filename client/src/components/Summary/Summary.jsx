@@ -8,7 +8,7 @@ import {
 	formatDecoratedPrice,
 	formatPercentage,
 	formatPrice,
-} from "../../utils/utils";
+} from "../../utils/Utils";
 
 export default function Summary() {
 	const { cashBalance, holdings, isAccountLoading } = useAccount();

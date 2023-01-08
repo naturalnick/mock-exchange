@@ -10,7 +10,7 @@ import Alert from "react-bootstrap/Alert";
 import Select from "react-select";
 import { useAccount } from "../../context/AccountProvider";
 import { tradeStock } from "../../utils/API";
-import { formatPrice } from "../../utils/utils";
+import { formatPrice } from "../../utils/Utils";
 import "./Modal.css";
 import ReceiptModal from "./ReceiptModal";
 

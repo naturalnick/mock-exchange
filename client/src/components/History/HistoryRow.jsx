@@ -1,4 +1,4 @@
-import { formatDate, formatPrice } from "../../utils/utils";
+import { formatDate, formatPrice } from "../../utils/Utils";
 import "./History.css";
 
 export default function HistoryRow({ date, symbol, quantity, price }) {

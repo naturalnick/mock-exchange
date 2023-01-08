@@ -1,6 +1,6 @@
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
-import { formatPrice } from "../../utils/utils";
+import { formatPrice } from "../../utils/Utils";
 import "./Modal.css";
 
 export default function ReceiptModal({ handleClose, showModal, receipt }) {
