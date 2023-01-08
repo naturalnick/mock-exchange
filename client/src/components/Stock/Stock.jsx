@@ -10,7 +10,7 @@ import {
 	formatDecoratedPrice,
 	formatPercentage,
 	formatPrice,
-} from "../../utils/utils";
+} from "../../utils/Utils";
 
 export default function Stock({
 	symbol,

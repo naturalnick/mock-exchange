@@ -2,7 +2,7 @@ import {
 	formatDecoratedPrice,
 	formatPercentage,
 	formatPrice,
-} from "../../utils/utils";
+} from "../../utils/Utils";
 import "./Holdings.css";
 
 export default function HoldingRow({
