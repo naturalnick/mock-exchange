@@ -1,5 +1,29 @@
 import axios from "axios";
 
+function getTokenFromCookie() {
+	const cname = "token=";
+	const decodedCookie = decodeURIComponent(document.cookie);
+	const cookies = decodedCookie.split(";");
+	for (let i = 0; i < cookies.length; i++) {
+		let c = cookies[0];
+		while (c.charAt(0) === " ") {
+			c = c.substring(1);
+		}
+		if (c.indexOf(cname) === 0) {
+			return c.substring(cname.length, c.length);
+		}
+	}
+	return "";
+}
+
+function setErrorMessage(error) {
+	if (error.message === "Network Error") {
+		return { error: "Server connection failed." };
+	} else {
+		return { error: error.response.data.error };
+	}
+}
+
 export async function registerAccount(email, password) {
 	const response = await axios
 		.post("/register", {
@@ -7,11 +31,7 @@ export async function registerAccount(email, password) {
 			password: password,
 		})
 		.catch((error) => {
-			if (error.message === "Network Error") {
-				return { error: "Server connection failed." };
-			} else {
-				return { error: error.response.data.error };
-			}
+			return setErrorMessage(error);
 		});
 	return response.status === 200 ? response.data : response;
 }
@@ -23,62 +43,50 @@ export async function loginAccount(email, password) {
 			password: password,
 		})
 		.catch((error) => {
-			if (error.message === "Network Error") {
-				return { error: "Server connection failed." };
-			} else {
-				return { error: error.response.data.error };
-			}
+			return setErrorMessage(error);
 		});
 	return response.status === 200 ? response.data : response;
 }
 
-export async function getAccount(token) {
+export async function getAccount() {
+	const token = getTokenFromCookie();
 	const response = await axios
 		.get("/api/account/info", {
 			headers: { Authorization: `token ${token}` },
 		})
 		.catch((error) => {
-			if (error.message === "Network Error") {
-				return { error: "Server connection failed." };
-			} else {
-				return { error: error.response.data.error };
-			}
+			return setErrorMessage(error);
 		});
 	return response.status === 200 ? response.data : response;
 }
 
-export async function getHoldings(token) {
+export async function getHoldings() {
+	const token = getTokenFromCookie();
 	const response = await axios
 		.get("/api/account/holdings", {
 			headers: { Authorization: `token ${token}` },
 		})
 		.catch((error) => {
-			if (error.message === "Network Error") {
-				return { error: "Server connection failed." };
-			} else {
-				return { error: error.response.data.error };
-			}
+			return setErrorMessage(error);
 		});
 
 	return response.status === 200 ? response.data.holdings : response;
 }
 
-export async function getDailyTotals(token) {
+export async function getDailyTotals() {
+	const token = getTokenFromCookie();
 	const response = await axios
 		.get(`/api/account/totals`, {
 			headers: { Authorization: `token ${token}` },
 		})
 		.catch((error) => {
-			if (error.message === "Network Error") {
-				return { error: "Server connection failed." };
-			} else {
-				return { error: error.response.data.error };
-			}
+			return setErrorMessage(error);
 		});
 	return response.status === 200 ? response.data.totals : response;
 }
 
-export async function toggleWatched(token, symbol, shouldWatch) {
+export async function toggleWatched(symbol, shouldWatch) {
+	const token = getTokenFromCookie();
 	const response = await axios
 		.post(
 			"/api/account/watchlist",
@@ -90,24 +98,17 @@ export async function toggleWatched(token, symbol, shouldWatch) {
 			}
 		)
 		.catch((error) => {
-			if (error.message === "Network Error") {
-				return { error: "Server connection failed." };
-			} else {
-				return { error: error.response.data.error };
-			}
+			return setErrorMessage(error);
 		});
 	return response.status === 200 ? response.data.holdings : response;
 }
 
-export async function getStockData(symbol) {
+export async function getStockData(symbols) {
+	const commaSeparatedSymbols = symbols.join(",");
 	const response = await axios
-		.get(`/api/stock/quote?symbol=${symbol}`)
+		.get(`/api/stock/quote?symbols=${commaSeparatedSymbols}`)
 		.catch((error) => {
-			if (error.message === "Network Error") {
-				return { error: "Server connection failed." };
-			} else {
-				return { error: error.response.data.error };
-			}
+			return setErrorMessage(error);
 		});
 
 	return response.status === 200 ? response.data : response;
@@ -117,32 +118,26 @@ export async function searchStocks(query) {
 	const response = await axios
 		.get(`/api/stock/search?query=${query}`)
 		.catch((error) => {
-			if (error.message === "Network Error") {
-				return { error: "Server connection failed." };
-			} else {
-				return { error: error.response.data.error };
-			}
+			return setErrorMessage(error);
 		});
 
 	return response.status === 200 ? response.data : response;
 }
 
-export async function getTransactions(token) {
+export async function getTransactions() {
+	const token = getTokenFromCookie();
 	const response = await axios
 		.get("/api/account/transactions", {
 			headers: { Authorization: `token ${token}` },
 		})
 		.catch((error) => {
-			if (error.message === "Network Error") {
-				return { error: "Server connection failed." };
-			} else {
-				return { error: error.response.data.error };
-			}
+			return setErrorMessage(error);
 		});
 	return response.status === 200 ? response.data.transactions : response;
 }
 
-export async function tradeStock(token, transaction) {
+export async function tradeStock(transaction) {
+	const token = getTokenFromCookie();
 	const response = await axios
 		.post(
 			"/api/trade",
@@ -156,11 +151,7 @@ export async function tradeStock(token, transaction) {
 			}
 		)
 		.catch((error) => {
-			if (error.message === "Network Error") {
-				return { error: "Server connection failed." };
-			} else {
-				return { error: error.response.data.error };
-			}
+			return setErrorMessage(error);
 		});
 	return response;
 }

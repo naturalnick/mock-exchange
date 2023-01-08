@@ -1,22 +1,20 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import Table from "react-bootstrap/Table";
-import { useAuth } from "../../context/AuthProvider";
 import { getTransactions } from "../../utils/API";
-import "./History.css";
 import HistoryRow from "./HistoryRow";
+import "./History.css";
 
 export default function History() {
-	const { token } = useAuth();
 	const [transactions, setTransactions] = useState([]);
-
-	const updateTransactions = useCallback(async () => {
-		const updatedTransactions = await getTransactions(token);
-		setTransactions(updatedTransactions);
-	}, [token]);
 
 	useEffect(() => {
 		updateTransactions();
-	}, [updateTransactions]);
+
+		async function updateTransactions() {
+			const updatedTransactions = await getTransactions();
+			setTransactions(updatedTransactions);
+		}
+	}, []);
 
 	function displayTransactions() {
 		return transactions.length > 0 ? (

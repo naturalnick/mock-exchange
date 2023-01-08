@@ -1,7 +1,6 @@
 from cryptography.fernet import Fernet
 from models import db, Account, Holdings, Transactions, DailyTotals
 from helpers import generate_account_id, get_account_market_value
-import api
 from datetime import datetime, date
 import time
 import pytz
@@ -13,14 +12,15 @@ fernet = Fernet(password_key)
 def update_watchlist(email, symbol):
 	account = db.session.query(Account).filter(Account.email == email).first()
 
-	watch_list = account.watch_list.split(" ")
+	watch_list = [] if watch_list == [""] else account.watch_list.split(",")
 	if symbol in watch_list:
 		watch_list.remove(symbol)
 	else:
 		watch_list.append(symbol)
-	
-	watch_list.sort()
-	db.session.query(Account).filter(Account.email == email).update({"watch_list": " ".join(watch_list)})
+		watch_list.sort()
+	new_watch_list = [] if watch_list == None else ",".join(watch_list)
+
+	db.session.query(Account).filter(Account.email == email).update({"watch_list": new_watch_list})
 	db.session.commit()
 
 

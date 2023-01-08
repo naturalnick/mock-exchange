@@ -4,16 +4,24 @@ import Placeholder from "react-bootstrap/Placeholder";
 import { useAccount } from "../../context/AccountProvider";
 import "./Summary.css";
 import Charts from "../Charts/Charts";
+import {
+	formatDecoratedPrice,
+	formatPercentage,
+	formatPrice,
+} from "../../utils/utils";
 
 export default function Summary() {
 	const { cashBalance, holdings, isAccountLoading } = useAccount();
 
-	const [accountValue, setAccountValue] = useState();
 	const [marketValue, setMarketValue] = useState();
 	const [baseCost, setBaseCost] = useState();
-	const [gainsLosses, setGainsLosses] = useState();
 
-	const getMarketValue = useCallback(() => {
+	const gainsLosses = Number(marketValue) - Number(baseCost);
+	const gainLossPercent =
+		gainsLosses !== 0 ? Number(marketValue) / Number(baseCost) / 100 : 0;
+	const accountValue = Number(marketValue) + Number(cashBalance);
+
+	const getTotalMarketValue = useCallback(() => {
 		let newMarketValue = 0;
 		for (let i = 0; i < holdings.length; i++) {
 			newMarketValue =
@@ -22,7 +30,7 @@ export default function Summary() {
 		return newMarketValue;
 	}, [holdings]);
 
-	const getBaseCost = useCallback(() => {
+	const getTotalCost = useCallback(() => {
 		let newBaseCost = 0;
 		for (let i = 0; i < holdings.length; i++) {
 			newBaseCost =
@@ -32,19 +40,12 @@ export default function Summary() {
 	}, [holdings]);
 
 	useEffect(() => {
-		let newMarketValue = getMarketValue();
-		let newBaseCost = getBaseCost();
+		const newMarketValue = getTotalMarketValue();
+		const newBaseCost = getTotalCost();
 
-		newMarketValue = Number(newMarketValue.toFixed(2));
-		newBaseCost = Number(newBaseCost.toFixed(2));
-		const newGainsLosses = (newMarketValue - newBaseCost).toFixed(2); //string
-		const newAccountValue = (newMarketValue + cashBalance).toFixed(2); //string
-
-		setAccountValue(newAccountValue);
 		setMarketValue(newMarketValue);
 		setBaseCost(newBaseCost);
-		setGainsLosses(newGainsLosses);
-	}, [holdings, cashBalance, getBaseCost, getMarketValue]);
+	}, [holdings, cashBalance, getTotalCost, getTotalMarketValue]);
 
 	return (
 		<>
@@ -63,47 +64,46 @@ export default function Summary() {
 				<tbody>
 					<tr>
 						<th>
-							$
 							{isAccountLoading ? (
 								<Placeholder xs={6} animation="glow" />
 							) : (
-								accountValue
+								formatPrice(accountValue)
 							)}
 						</th>
 						<td>
-							$
 							{isAccountLoading ? (
 								<Placeholder xs={6} animation="glow" />
 							) : (
-								Number(cashBalance.toFixed(2))
+								formatPrice(cashBalance)
 							)}
 						</td>
 						<td>
-							$
 							{isAccountLoading ? (
 								<Placeholder xs={6} animation="glow" />
 							) : (
-								marketValue
+								formatPrice(marketValue)
 							)}
 						</td>
 						<td>
-							$
 							{isAccountLoading ? (
 								<Placeholder xs={6} animation="glow" />
 							) : (
-								baseCost
+								formatPrice(baseCost)
 							)}
 						</td>
-						<td
-							style={
-								gainsLosses < 0 ? { color: "red" } : { color: "green" }
-							}
-						>
+						<td>
 							{gainsLosses > 0 && "+"}
 							{isAccountLoading ? (
 								<Placeholder bg="dark" xs={6} animation="glow" />
 							) : (
-								`$${gainsLosses}`
+								<>
+									{formatDecoratedPrice(gainsLosses)}{" "}
+									{formatPercentage(
+										gainsLosses < 0
+											? -gainLossPercent
+											: gainLossPercent
+									)}
+								</>
 							)}
 						</td>
 					</tr>

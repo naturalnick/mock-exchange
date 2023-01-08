@@ -7,7 +7,6 @@ blueprint = Blueprint("blueprint", __name__, static_folder="../client/build", st
 
 @blueprint.route("/")
 def index():
-	print(api.search_stocks("apple"))
 	return blueprint.send_static_file("index.html"), 200
 
 
@@ -44,12 +43,11 @@ def register_user():
 
 @blueprint.route("/api/stock/quote", methods=["GET"])
 def get_stock():
-	stock_symbol = request.args.get("symbol")
+	comma_separated_symbols = request.args.get("symbols")
 
-	data = api.get_stock_data(stock_symbol)
-	if data is None:
-		return {"error": "Stock not found."}, 404
-	return data, 200
+	data = api.get_stock_data(comma_separated_symbols)
+	if data is not None: return data, 200
+	return {"error": "Stock not found."}, 404
 
 
 @blueprint.route("/api/stock/search", methods=["GET"])
@@ -82,7 +80,7 @@ def account_watchlist():
 	data = request.json
 	update_watchlist(email, data["symbol"])
 
-	return {"Success": "Watchlist updated."}, 200
+	return {}, 200
 
 
 @blueprint.route("/api/account/holdings", methods=["GET"])
@@ -141,4 +139,4 @@ def trade():
 	modify_holdings(**transaction)
 	adjust_balance(account.id, account.balance, transaction_amount)
 	log_transaction(**transaction)
-	return "Ok", 200
+	return {}, 200

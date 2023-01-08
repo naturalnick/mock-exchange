@@ -11,7 +11,7 @@ import { getAccount, getHoldings, getStockData } from "../utils/API";
 const AccountContext = createContext();
 
 function AccountProvider({ children }) {
-	const { token, handleLogout } = useAuth();
+	const { handleLogout } = useAuth();
 	const [accountNumber, setAccountNumber] = useState(0);
 	const [cashBalance, setCashBalance] = useState(0);
 	const [holdings, setHoldings] = useState([]);
@@ -20,49 +20,44 @@ function AccountProvider({ children }) {
 
 	const updateAccountInfo = useCallback(async () => {
 		setIsAccountLoading(true);
-		const account = await getAccount(token);
+		const account = await getAccount();
 		if ("error" in account) {
 			if (account.error === "invalid token") handleLogout();
 		}
+
 		setAccountNumber(Number(account.account_number));
 		setCashBalance(Number(account.balance));
-		updateWatchlist(
-			account.watch_list
-				.split(" ")
-				.filter((item) => item !== "" && item !== "[]")
-			//TODO fix bug where emtpy array is saved to the watchlist when it's initially empty
-		);
-	}, [token, handleLogout]);
+		updateWatchlist(account.watch_list.split(","));
+	}, [handleLogout]);
 
 	const updateAccountHoldings = useCallback(async () => {
-		const holdings = await getHoldings(token);
-		if (!holdings.length && "error" in holdings) {
+		const holdings = await getHoldings();
+		if ("error" in holdings) {
 			if (holdings.error === "invalid token") handleLogout();
 		}
-		for (let i = 0; i < holdings.length; i++) {
-			const stockData = await getStockData(holdings[i].symbol);
-
-			holdings[i].marketValue = stockData.latestPrice;
-
-			holdings[i].companyName = stockData.companyName;
+		const holdingSymbols = holdings.map((holding) => holding.symbol);
+		const stockData = await getStockData(holdingSymbols);
+		for (let h = 0; h < holdings.length; h++) {
+			for (let i = 0; i < stockData.length; i++) {
+				if (holdings[i].symbol === stockData[h].symbol) {
+					holdings[i].marketValue = stockData[h].latestPrice;
+					holdings[i].companyName = stockData[h].companyName;
+				}
+			}
 		}
 
 		setHoldings(holdings);
 		setIsAccountLoading(false);
-	}, [token, handleLogout]);
+	}, [handleLogout]);
 
 	useEffect(() => {
 		updateAccountInfo();
 		updateAccountHoldings();
 	}, [updateAccountInfo, updateAccountHoldings]);
 
-	async function updateWatchlist(watchList) {
-		const watchListData = [];
-		for (let i = 0; i < watchList.length; i++) {
-			const stockData = await getStockData(watchList[i]);
-			watchListData.push(stockData);
-		}
-		setWatchlist(watchListData);
+	async function updateWatchlist(commaSeparatedSymbols) {
+		const stockData = await getStockData(commaSeparatedSymbols);
+		setWatchlist(stockData);
 	}
 
 	return (
