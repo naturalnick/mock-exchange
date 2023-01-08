@@ -7,13 +7,13 @@ import { useAccount } from "../../context/AccountProvider";
 
 export default function Trade() {
 	const { watchList } = useAccount();
-	const [stock, setStock] = useState({});
+	const [stock, setStock] = useState([]);
 
 	function displaySearchedStock() {
 		return (
 			Object.keys(stock).length !== 0 && (
 				<Col xl={6} className="mt-3">
-					<Stock {...stock} />
+					<Stock {...stock[0]} />
 				</Col>
 			)
 		);

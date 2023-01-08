@@ -2,11 +2,15 @@ import { useState, useEffect } from "react";
 import Col from "react-bootstrap/esm/Col";
 import Row from "react-bootstrap/esm/Row";
 import Button from "react-bootstrap/esm/Button";
-import TradeModal from "../TradeModal/TradeModal";
-import { useAuth } from "../../context/AuthProvider";
+import TradeModal from "../Modals/TradeModal";
 import { useAccount } from "../../context/AccountProvider";
 import { toggleWatched } from "../../utils/API";
 import "./Stock.css";
+import {
+	formatDecoratedPrice,
+	formatPercentage,
+	formatPrice,
+} from "../../utils/utils";
 
 export default function Stock({
 	symbol,
@@ -19,13 +23,12 @@ export default function Stock({
 	low,
 	previousClose,
 }) {
-	const { token } = useAuth();
 	const { updateAccountInfo, watchList } = useAccount();
-	const [showTradeModal, setShowTradeModal] = useState(false);
 	const [isWatched, setIsWatched] = useState(false);
 
-	const handleClose = () => setShowTradeModal(false);
-	const handleShow = () => setShowTradeModal(true);
+	const [showTradeModal, setShowTradeModal] = useState(false);
+	const handleTradeClose = () => setShowTradeModal(false);
+	const handleTradeShow = () => setShowTradeModal(true);
 
 	useEffect(() => {
 		setIsWatched(false);
@@ -43,21 +46,8 @@ export default function Stock({
 	})} ${today.toLocaleDateString()}`;
 
 	async function handleWatchlist() {
-		await toggleWatched(token, symbol, !isWatched);
+		await toggleWatched(symbol, !isWatched);
 		updateAccountInfo();
-	}
-
-	function displayTodaysChange() {
-		const changeStyle =
-			change < 0 ? "stock-stat decrease" : "stock-stat increase";
-		const changePrefix = change < 0 ? "-" : "+";
-		const formattedChange = change < 0 ? String(change).slice(1) : change;
-		const formattedChangePercent = Number(changePercent).toFixed(2);
-		return (
-			<div className={changeStyle}>
-				{changePrefix}${formattedChange} ({formattedChangePercent}%)
-			</div>
-		);
 	}
 
 	return (
@@ -69,7 +59,7 @@ export default function Stock({
 					</span>
 				</Col>
 				<Col md={6} className="align-right">
-					<Button size="sm" variant="success" onClick={handleShow}>
+					<Button size="sm" variant="success" onClick={handleTradeShow}>
 						Trade
 					</Button>{" "}
 					<Button size="sm" variant="secondary" onClick={handleWatchlist}>
@@ -80,27 +70,32 @@ export default function Stock({
 			<Row className="mb-2">
 				<Col>
 					<div className="stock-stat-header">Price</div>
-					<div className="stock-stat">${latestPrice}</div>
+					<div className="stock-stat">{formatPrice(latestPrice)}</div>
 				</Col>
 				<Col>
 					<div className="stock-stat-header">Todays's Change</div>
-					{displayTodaysChange()}
+					<div className="stock-stat">
+						{formatDecoratedPrice(change)} (
+						{formatPercentage(changePercent)})
+					</div>
 				</Col>
 			</Row>
 			<Row className="mb-2">
 				<Col>
 					<div className="stock-stat-header">Open Price</div>
-					<div className="stock-stat-secondary">${open}</div>
+					<div className="stock-stat-secondary">{formatPrice(open)}</div>
 				</Col>
 
 				<Col>
 					<div className="stock-stat-header">Previous Close</div>
-					<div className="stock-stat-secondary">${previousClose}</div>
+					<div className="stock-stat-secondary">
+						{formatPrice(previousClose)}
+					</div>
 				</Col>
 				<Col>
 					<div className="stock-stat-header">Day High/Low</div>
 					<div className="stock-stat-secondary">
-						${high}/${low}
+						{formatPrice(high)}/{formatPrice(low)}
 					</div>
 				</Col>
 			</Row>
@@ -110,8 +105,8 @@ export default function Stock({
 				</Col>
 			</Row>
 			<TradeModal
-				handleClose={handleClose}
-				showTradeModal={showTradeModal}
+				handleClose={handleTradeClose}
+				showModal={showTradeModal}
 				symbol={symbol}
 				price={latestPrice}
 			/>

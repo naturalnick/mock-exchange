@@ -12,7 +12,7 @@ export default function SearchBar({ setStock }) {
 
 	const getSuggestions = useCallback(async (query) => {
 		const queriedStocks = await searchStocks(query.toLowerCase());
-		console.log(queriedStocks);
+
 		if (queriedStocks.length > 0) {
 			setSuggestions(queriedStocks);
 		} else {
@@ -43,7 +43,7 @@ export default function SearchBar({ setStock }) {
 			return suggestions.map((suggestion) => {
 				return (
 					<Suggestion
-						key={suggestion.id}
+						key={suggestion.symbol}
 						{...suggestion}
 						handleClick={handleSuggestionClicked}
 					/>
@@ -55,7 +55,7 @@ export default function SearchBar({ setStock }) {
 	}
 
 	async function handleSuggestionClicked(symbol) {
-		const stockData = await getStockData(symbol);
+		const stockData = await getStockData([symbol]);
 		if ("error" in stockData) {
 			setError(stockData.error);
 		} else {

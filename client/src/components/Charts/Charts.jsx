@@ -3,12 +3,10 @@ import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import { Chart } from "react-google-charts";
 import { useAccount } from "../../context/AccountProvider";
-import { useAuth } from "../../context/AuthProvider";
 import { getDailyTotals } from "../../utils/API";
 import "./Charts.css";
 
 export default function Charts() {
-	const { token } = useAuth();
 	const { holdings, cashBalance } = useAccount();
 	const [holdingsData, setHoldingsData] = useState([]);
 	const [dailyData, setDailyData] = useState([]);
@@ -28,7 +26,7 @@ export default function Charts() {
 	}, [cashBalance, holdings]);
 
 	const updateDailyTotals = useCallback(async () => {
-		const totals = await getDailyTotals(token);
+		const totals = await getDailyTotals();
 		let data = [["Date", "Value"]];
 
 		if (totals.length < 1) {
@@ -42,7 +40,7 @@ export default function Charts() {
 		}
 
 		setDailyData(data);
-	}, [cashBalance, token, totalMarketValue]);
+	}, [cashBalance, totalMarketValue]);
 
 	useEffect(() => {
 		updateHoldingsData();
