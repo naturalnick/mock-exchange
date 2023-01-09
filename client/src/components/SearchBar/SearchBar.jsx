@@ -1,19 +1,21 @@
 import { useEffect, useState, useCallback } from "react";
 import Form from "react-bootstrap/Form";
 import { getStockData, searchStocks } from "../../utils/API";
-import Suggestion from "./Suggestion";
 import "./SearchBar.css";
+import Suggestions from "./Suggestions";
 
 export default function SearchBar({ setStock }) {
 	const [input, setInput] = useState("");
 	const [suggestions, setSuggestions] = useState([]);
-	const [isSearching, setIsSearching] = useState(false);
 	const [error, setError] = useState("");
 
 	const getSuggestions = useCallback(async (query) => {
 		const queriedStocks = await searchStocks(query.toLowerCase());
-
-		if (queriedStocks.length > 0) {
+		if ("error" in queriedStocks) {
+			setSuggestions([]);
+			setError(queriedStocks.error);
+			console.log(queriedStocks);
+		} else if (queriedStocks.length > 0) {
 			setSuggestions(queriedStocks);
 		} else {
 			setSuggestions([]);
@@ -25,7 +27,6 @@ export default function SearchBar({ setStock }) {
 		const delayTimer = setTimeout(() => {
 			if (input !== "") getSuggestions(input);
 			else setSuggestions([]);
-			setIsSearching(false);
 		}, 1000);
 		return () => clearTimeout(delayTimer);
 	}, [input, getSuggestions]);
@@ -33,24 +34,7 @@ export default function SearchBar({ setStock }) {
 	function handleKeyDown(e) {
 		if (e.key === "Enter") {
 		} else {
-			setIsSearching(true);
 			setStock({});
-		}
-	}
-
-	function displaySuggestions() {
-		if (suggestions.length > 0) {
-			return suggestions.map((suggestion) => {
-				return (
-					<Suggestion
-						key={suggestion.symbol}
-						{...suggestion}
-						handleClick={handleSuggestionClicked}
-					/>
-				);
-			});
-		} else if (!isSearching) {
-			return <>{error}</>;
 		}
 	}
 
@@ -60,7 +44,6 @@ export default function SearchBar({ setStock }) {
 			setError(stockData.error);
 		} else {
 			setStock(stockData);
-			setIsSearching(false);
 			setInput("");
 		}
 		setSuggestions([]);
@@ -77,9 +60,12 @@ export default function SearchBar({ setStock }) {
 				onChange={(e) => setInput(e.target.value)}
 				onKeyDown={handleKeyDown}
 			/>
-			{!isSearching && input !== "" && (
-				<div className="suggestion-container">{displaySuggestions()}</div>
-			)}
+			<Suggestions
+				suggestions={suggestions}
+				handleClick={handleSuggestionClicked}
+				input={input}
+				error={error}
+			/>
 		</div>
 	);
 }

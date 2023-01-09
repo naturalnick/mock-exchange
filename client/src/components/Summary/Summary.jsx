@@ -92,7 +92,6 @@ export default function Summary() {
 							)}
 						</td>
 						<td>
-							{gainsLosses > 0 && "+"}
 							{isAccountLoading ? (
 								<Placeholder bg="dark" xs={6} animation="glow" />
 							) : (
