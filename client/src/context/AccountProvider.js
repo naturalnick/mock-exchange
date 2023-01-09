@@ -27,11 +27,18 @@ function AccountProvider({ children }) {
 
 		setAccountNumber(Number(account.account_number));
 		setCashBalance(Number(account.balance));
-		updateWatchlist(account.watch_list.split(","));
+		if (account.watch_list.length > 0) {
+			updateWatchlist(account.watch_list.split(","));
+		} else setWatchlist([]);
 	}, [handleLogout]);
 
 	const updateAccountHoldings = useCallback(async () => {
 		const holdings = await getHoldings();
+		if (holdings.length === 0) {
+			setHoldings([]);
+			setIsAccountLoading(false);
+			return;
+		}
 		if ("error" in holdings) {
 			if (holdings.error === "invalid token") handleLogout();
 		}

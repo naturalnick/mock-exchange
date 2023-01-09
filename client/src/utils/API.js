@@ -85,7 +85,7 @@ export async function getDailyTotals() {
 	return response.status === 200 ? response.data.totals : response;
 }
 
-export async function toggleWatched(symbol, shouldWatch) {
+export async function toggleWatched(symbol) {
 	const token = getTokenFromCookie();
 	const response = await axios
 		.post(
@@ -104,9 +104,9 @@ export async function toggleWatched(symbol, shouldWatch) {
 }
 
 export async function getStockData(symbols) {
-	const commaSeparatedSymbols = symbols.join(",");
+	const symbolString = symbols.length > 1 ? symbols.join(",") : symbols;
 	const response = await axios
-		.get(`/api/stock/quote?symbols=${commaSeparatedSymbols}`)
+		.get(`/api/stock/quote?symbols=${symbolString}`)
 		.catch((error) => {
 			return setErrorMessage(error);
 		});

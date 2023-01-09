@@ -31,7 +31,7 @@ export default function Trade() {
 		} else {
 			return (
 				<p>
-					Search for stocks, then add them to your watchlist to for easy
+					Search for stocks then add them to your watchlist for easy
 					access.
 				</p>
 			);
