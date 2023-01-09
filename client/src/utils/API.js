@@ -17,7 +17,7 @@ function getTokenFromCookie() {
 }
 
 function setErrorMessage(error) {
-	if (error.message === "Network Error") {
+	if (error.response.status === 500) {
 		return { error: "Server connection failed." };
 	} else {
 		return { error: error.response.data.error };
@@ -118,9 +118,9 @@ export async function searchStocks(query) {
 	const response = await axios
 		.get(`/api/stock/search?query=${query}`)
 		.catch((error) => {
+			console.log(setErrorMessage(error));
 			return setErrorMessage(error);
 		});
-
 	return response.status === 200 ? response.data : response;
 }
 
