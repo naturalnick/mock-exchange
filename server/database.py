@@ -11,8 +11,8 @@ fernet = Fernet(password_key)
 
 def update_watchlist(email, symbol):
 	account = db.session.query(Account).filter(Account.email == email).first()
-
-	watch_list = [] if watch_list == [""] else account.watch_list.split(",")
+	watch_list = account.watch_list
+	watch_list = [] if watch_list == [""] else watch_list.split(",")
 	if symbol in watch_list:
 		watch_list.remove(symbol)
 	else:

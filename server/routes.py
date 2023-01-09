@@ -78,6 +78,7 @@ def account_watchlist():
 		return {"error": "invalid token"}, 401
 		
 	data = request.json
+
 	update_watchlist(email, data["symbol"])
 
 	return {}, 200
