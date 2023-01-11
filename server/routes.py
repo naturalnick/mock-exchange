@@ -7,6 +7,7 @@ blueprint = Blueprint("blueprint", __name__, static_folder="../client/build", st
 
 @blueprint.route("/")
 def index():
+	print(api.get_stock_data("SNAP,AAPL"))
 	return blueprint.send_static_file("index.html"), 200
 
 
@@ -46,6 +47,7 @@ def get_stock():
 	comma_separated_symbols = request.args.get("symbols")
 
 	data = api.get_stock_data(comma_separated_symbols)
+	print(data)
 	if data is not None: return data, 200
 	return {"error": "Stock not found."}, 404
 

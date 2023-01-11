@@ -18,18 +18,27 @@ TWELVE_TOKEN = os.getenv("TWELVE_TOKEN")
 
 
 def get_stock_data(symbols):
+
 	try:
 		res1 = requests.get(f"https://api.twelvedata.com/quote?symbol={symbols}&apikey={TWELVE_TOKEN}")
 		res2 = requests.get(f"https://api.twelvedata.com/price?symbol={symbols}&apikey={TWELVE_TOKEN}")
 
-		stocks = list(res1.json().values())
-		prices = res2.json()
+		isBatch = "," in symbols
 
-		for stock in stocks:
-			for symbol in [*prices]:
-				if stock["symbol"] == symbol:
-					stock["price"] = prices[symbol]["price"]
+		if isBatch:
+			stocks = list(res1.json().values())
 
+			prices = [{"symbol": key, "price": value["price"]} for key, value in res2.json().items()]
+
+			for stock in stocks:
+				for price in prices:
+					if stock["symbol"] == price["symbol"]:
+						stock["price"] = price["price"]
+		else:
+			stocks = res1.json()
+			price = res2.json()
+			stocks["price"] = price["price"]
+			stocks = [stocks]
 		return [{"symbol": stock["symbol"], "companyName": stock["name"], "latestPrice": stock["price"], "change": stock["change"], "changePercent": stock["percent_change"], "high": stock["high"], "low": stock["low"], "open": stock["open"], "previousClose": stock["close"] } for stock in stocks]
 	except:
 		return None
