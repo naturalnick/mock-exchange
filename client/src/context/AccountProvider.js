@@ -28,6 +28,7 @@ function AccountProvider({ children }) {
 		setAccountNumber(Number(account.account_number));
 		setCashBalance(Number(account.balance));
 		if (account.watch_list.length > 0) {
+			console.log(account.watch_list);
 			updateWatchlist(account.watch_list.split(","));
 		} else setWatchlist([]);
 	}, [handleLogout]);
@@ -43,6 +44,7 @@ function AccountProvider({ children }) {
 			if (holdings.error === "invalid token") handleLogout();
 		}
 		const holdingSymbols = holdings.map((holding) => holding.symbol);
+
 		const stockData = await getStockData(holdingSymbols);
 		for (let h = 0; h < holdings.length; h++) {
 			for (let i = 0; i < stockData.length; i++) {
@@ -63,8 +65,10 @@ function AccountProvider({ children }) {
 	}, [updateAccountInfo, updateAccountHoldings]);
 
 	async function updateWatchlist(commaSeparatedSymbols) {
+		console.log(commaSeparatedSymbols);
 		const stockData = await getStockData(commaSeparatedSymbols);
-		setWatchlist(stockData);
+		if ("error" in stockData) setWatchlist([]);
+		else setWatchlist(stockData);
 	}
 
 	return (

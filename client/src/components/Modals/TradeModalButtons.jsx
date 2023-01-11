@@ -11,6 +11,13 @@ function TradeModalButtons({
 	isSubmitting,
 	handleSubmit,
 }) {
+	const disableTradeButton = () => {
+		if (cashBalance < total && action === "buy") return true;
+		if (quantity > shareHolding && action === "sell") return true;
+		if (isSubmitting) return true;
+		return false;
+	};
+
 	return (
 		<Stack direction="horizontal" gap={3}>
 			<Button className="ms-auto" variant="secondary" onClick={handleClose}>
@@ -19,11 +26,7 @@ function TradeModalButtons({
 			<Button
 				variant="success"
 				onClick={handleSubmit}
-				disabled={
-					(cashBalance < total && action === "buy") ||
-					(quantity > shareHolding && action === "sell") ||
-					isSubmitting
-				}
+				disabled={disableTradeButton()}
 			>
 				Trade
 			</Button>

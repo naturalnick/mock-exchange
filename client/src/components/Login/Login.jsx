@@ -38,13 +38,13 @@ export default function Login({ setIsRegistering }) {
 						<Form.Label>Email</Form.Label>
 						<Form.Control
 							required
-							type="email"
+							type="text"
 							placeholder="eg. name@email.com"
 							value={email || ""}
 							onChange={(e) => setEmail(e.target.value)}
 						/>
 						<Form.Control.Feedback type="invalid">
-							Please provide a valid email.
+							Please provide an email address.
 						</Form.Control.Feedback>
 					</Form.Group>
 

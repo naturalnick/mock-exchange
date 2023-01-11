@@ -51,7 +51,7 @@ export default function Summary() {
 		<>
 			<h3>Account Summary</h3>
 			<Charts />
-			<Table>
+			<Table responsive="sm">
 				<thead>
 					<tr>
 						<th>Account Value</th>
