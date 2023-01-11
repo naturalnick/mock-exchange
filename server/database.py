@@ -67,7 +67,7 @@ def create_account(email, password):
 
 	starting_balance = 100000
 
-	newAccount = Account(id=account_id, email=email, password=encrypted_pass, balance=starting_balance, watch_list='[]')
+	newAccount = Account(id=account_id, email=email, password=encrypted_pass, balance=starting_balance, watch_list='')
 	db.session.add(newAccount)
 
 	new_total = DailyTotals(account_number=account_id, date=str(date.today()), value=starting_balance)
