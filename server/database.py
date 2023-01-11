@@ -20,6 +20,8 @@ def update_watchlist(email, symbol):
 		watch_list.sort()
 	new_watch_list = [] if watch_list == None else ",".join(watch_list)
 
+	if new_watch_list[0] == ",": new_watch_list = new_watch_list[1:]
+
 	db.session.query(Account).filter(Account.email == email).update({"watch_list": new_watch_list})
 	db.session.commit()
 

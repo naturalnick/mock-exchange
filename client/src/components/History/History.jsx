@@ -33,7 +33,7 @@ export default function History() {
 	return (
 		<>
 			<h3>History</h3>
-			<Table striped hover>
+			<Table striped hover responsive="sm">
 				<thead>
 					<tr>
 						<th>Date</th>

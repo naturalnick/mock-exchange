@@ -12,7 +12,7 @@ class Account(db.Model):
 class Holdings(db.Model):
 	id = db.Column(db.Integer, db.Identity(start=1, cycle=True), primary_key=True)
 	account_number = db.Column(db.String, nullable=False)
-	symbol = db.Column(db.String, unique=True, nullable=False)
+	symbol = db.Column(db.String, nullable=False)
 	shares = db.Column(db.Float, nullable=False)
 	base_cost = db.Column(db.Float, nullable=False)
 

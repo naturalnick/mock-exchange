@@ -1,7 +1,7 @@
 import Alert from "react-bootstrap/Alert";
 import { formatPrice } from "../../utils/Utils";
 
-export default function TradeModalDetails({
+export default function TradeModalErrors({
 	quantity,
 	action,
 	cashBalance,

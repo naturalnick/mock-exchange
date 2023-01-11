@@ -15,7 +15,6 @@ function TradeQuantityInput({
 			<Form.Label>Quantity</Form.Label>
 			<InputGroup>
 				<Form.Control
-					required
 					type="number"
 					name="quantity"
 					placeholder="Number of shares"

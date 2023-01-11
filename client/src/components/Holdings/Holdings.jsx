@@ -24,7 +24,7 @@ export default function Holdings() {
 	return (
 		<>
 			<h3>Holdings</h3>
-			<Table striped hover>
+			<Table striped hover responsive="sm">
 				<thead>
 					<tr>
 						<th>Symbol</th>

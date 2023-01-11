@@ -11,15 +11,18 @@ import "./Modal.css";
 import ReceiptModal from "./ReceiptModal";
 import TradeActionSelect from "./TradeActionSelect";
 import TradeQuantityInput from "./TradeQuantityInput";
-import TradeModalDetails from "./TradeModalDetails";
+import TradeModalErrors from "./TradeModalErrors";
 import TradeModalButtons from "./TradeModalButtons";
 
 const schema = yup.object().shape({
 	action: yup.string().required("Action is required."),
 	quantity: yup
-		.number()
-		.positive("Quantity cannot be negative.")
+		.number("Value must be a number.")
 		.integer("Quantity must be a whole number.")
+		.test("positive", "Quantity must be greater than 0.", (value) => {
+			console.log(value);
+			return value > 0;
+		})
 		.required("Quantity is required."),
 });
 
@@ -27,7 +30,11 @@ export default function TradeModal({ handleClose, showModal, symbol, price }) {
 	const { cashBalance, holdings, updateAccountInfo, updateAccountHoldings } =
 		useAccount();
 	const [shareHolding, setShareHolding] = useState();
+
 	const [receipt, setReceipt] = useState({});
+	const [showReceiptModal, setShowReceiptModal] = useState(false);
+	const handleReceiptClose = () => setShowReceiptModal(false);
+	const handleReceiptShow = () => setShowReceiptModal(true);
 
 	const {
 		handleSubmit,
@@ -45,10 +52,6 @@ export default function TradeModal({ handleClose, showModal, symbol, price }) {
 			quantity: 0,
 		},
 	});
-
-	const [showReceiptModal, setShowReceiptModal] = useState(false);
-	const handleReceiptClose = () => setShowReceiptModal(false);
-	const handleReceiptShow = () => setShowReceiptModal(true);
 
 	useEffect(() => {
 		let shareQuantity = 0;
@@ -116,7 +119,7 @@ export default function TradeModal({ handleClose, showModal, symbol, price }) {
 							Total:{" "}
 							<span className="trade-price">{formatPrice(total)}</span>
 						</div>
-						<TradeModalDetails
+						<TradeModalErrors
 							quantity={values.quantity}
 							action={values.action}
 							cashBalance={cashBalance}
