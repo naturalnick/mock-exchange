@@ -48,55 +48,57 @@ def get_stock_data(symbols):
                     "previousClose": None,
                 }
             )
+            print("API")
+            print(stock_data)
     return stock_data
 
 
-# TWELVE STOCK DATA
-def get_stock_data2(symbols):
+# # TWELVE STOCK DATA
+# def get_stock_data2(symbols):
 
-    try:
-        res1 = requests.get(
-            f"https://api.twelvedata.com/quote?symbol={symbols}&apikey={TWELVE_TOKEN}"
-        )
-        res2 = requests.get(
-            f"https://api.twelvedata.com/price?symbol={symbols}&apikey={TWELVE_TOKEN}"
-        )
+#     try:
+#         res1 = requests.get(
+#             f"https://api.twelvedata.com/quote?symbol={symbols}&apikey={TWELVE_TOKEN}"
+#         )
+#         res2 = requests.get(
+#             f"https://api.twelvedata.com/price?symbol={symbols}&apikey={TWELVE_TOKEN}"
+#         )
 
-        isBatch = "," in symbols
+#         isBatch = "," in symbols
 
-        if isBatch:
-            stocks = list(res1.json().values())
+#         if isBatch:
+#             stocks = list(res1.json().values())
 
-            prices = [
-                {"symbol": key, "price": value["price"]}
-                for key, value in res2.json().items()
-            ]
+#             prices = [
+#                 {"symbol": key, "price": value["price"]}
+#                 for key, value in res2.json().items()
+#             ]
 
-            for stock in stocks:
-                for price in prices:
-                    if stock["symbol"] == price["symbol"]:
-                        stock["price"] = price["price"]
-        else:
-            stocks = res1.json()
-            price = res2.json()
-            stocks["price"] = price["price"]
-            stocks = [stocks]
-        return [
-            {
-                "symbol": stock["symbol"],
-                "companyName": stock["name"],
-                "latestPrice": stock["price"],
-                "change": stock["change"],
-                "changePercent": stock["percent_change"],
-                "high": stock["high"],
-                "low": stock["low"],
-                "open": stock["open"],
-                "previousClose": stock["close"],
-            }
-            for stock in stocks
-        ]
-    except:
-        return None
+#             for stock in stocks:
+#                 for price in prices:
+#                     if stock["symbol"] == price["symbol"]:
+#                         stock["price"] = price["price"]
+#         else:
+#             stocks = res1.json()
+#             price = res2.json()
+#             stocks["price"] = price["price"]
+#             stocks = [stocks]
+#         return [
+#             {
+#                 "symbol": stock["symbol"],
+#                 "companyName": stock["name"],
+#                 "latestPrice": stock["price"],
+#                 "change": stock["change"],
+#                 "changePercent": stock["percent_change"],
+#                 "high": stock["high"],
+#                 "low": stock["low"],
+#                 "open": stock["open"],
+#                 "previousClose": stock["close"],
+#             }
+#             for stock in stocks
+#         ]
+#     except:
+#         return None
 
 
 def search_stocks(text):
