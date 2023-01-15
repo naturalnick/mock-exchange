@@ -33,30 +33,29 @@ function AccountProvider({ children }) {
 	}, [handleLogout]);
 
 	const updateAccountHoldings = useCallback(async () => {
-		const holdings = await getHoldings();
-		if (holdings.length === 0) {
+		const holdingsData = await getHoldings();
+		console.log(holdingsData);
+		if (holdingsData.length === 0) {
 			setHoldings([]);
 			setIsAccountLoading(false);
 		} else {
-			if ("error" in holdings) {
-				if (holdings.error === "invalid token") handleLogout();
+			if ("error" in holdingsData) {
+				if (holdingsData.error === "invalid token") handleLogout();
 			}
-			const holdingSymbols = holdings.map((holding) => holding.symbol);
+			const holdingSymbols = holdingsData.map((holding) => holding.symbol);
 
 			const stockData = await getStockData(holdingSymbols);
 			console.log(stockData);
-			for (let h = 0; h < holdings.length; h++) {
+			for (let h = 0; h < holdingsData.length; h++) {
 				for (let i = 0; i < stockData.length; i++) {
-					if (holdings[h].symbol === stockData[i].symbol) {
-						holdings[h].marketValue = stockData[i].latestPrice;
-						console.log(stockData[i]);
-						holdings[h].companyName = stockData[i].companyName;
-						console.log(stockData[i].companyName);
+					if (holdingsData[h].symbol === stockData[i].symbol) {
+						holdingsData[h].marketValue = stockData[i].latestPrice;
+						holdingsData[h].companyName = stockData[i].companyName;
 					}
 				}
 			}
 
-			setHoldings(holdings);
+			setHoldings(holdingsData);
 			setIsAccountLoading(false);
 		}
 	}, [handleLogout]);
