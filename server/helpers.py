@@ -28,11 +28,16 @@ def decode_token(token):
 
 
 def get_account_market_value(holdings):
+    symbols = [holding["symbol"] for holding in holdings]
+    stock_data = api.get_stock_data(symbols)
+
     market_value_total = 0
-    for holding in holdings:
-        stock_data = api.get_stock_data(holding["symbol"])
-        share_market_value = stock_data["latestPrice"]
-        market_value_total = market_value_total + (
-            share_market_value * holding["quantity"]
-        )
+    for stock in stock_data:
+        share_market_value = stock["latestPrice"]
+
+        for holding in holdings:
+            if holding["symbol"] == stock["symbol"]:
+                market_value_total = market_value_total + (
+                    share_market_value * holding["quantity"]
+                )
     return market_value_total

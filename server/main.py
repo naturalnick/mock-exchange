@@ -1,9 +1,24 @@
 from flask import Flask
 from flask_cors import CORS
 import os
+import pytz
+from datetime import datetime, date
+from apscheduler.schedulers.background import BackgroundScheduler
+from database import check_daily_total_logged, set_account_totals
 from dotenv import load_dotenv
 
 load_dotenv()
+
+
+def daily_totals():
+    with app.app_context():
+        today = str(date.today())
+        current_hour = int(datetime.now().astimezone(pytz.utc).strftime("%H"))
+        us_market_closing_hour_utc = 21  # 4PM EST
+        print(f"Server status check. Date: {today}, Hour: {current_hour}/24 (UTC).")
+        if check_daily_total_logged(today) is False:
+            print("Assigning account totals.")
+            set_account_totals(today)
 
 
 def create_app():
@@ -24,13 +39,17 @@ def create_app():
 
         app.register_blueprint(blueprint)
 
-        # from database import daily_totals
-        # Thread(target=daily_totals, daemon=True).start()
+        sched = BackgroundScheduler(daemon=True)
+        sched.add_job(
+            daily_totals, "interval", minutes=60, id="totals", replace_existing=True
+        )
+        sched.start()
 
         return app
 
 
 app = create_app()
 
+
 if __name__ == "__main__":
-    app.run(debug=True, port=5001)
+    app.run(port=5001)

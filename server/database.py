@@ -2,7 +2,6 @@ from cryptography.fernet import Fernet
 from models import db, Account, Holdings, Transactions, DailyTotals
 from helpers import generate_account_id, get_account_market_value
 from datetime import datetime, date
-import time
 import pytz
 import os
 
@@ -187,34 +186,15 @@ def set_account_totals(date):
     for account in accounts:
         holdings = get_account_holdings(account.id)
 
-        market_value_total = get_account_market_value(holdings)
-        account_value = round(account.balance + market_value_total, 2)
+        if holdings is None:
+            market_value_total = 0
+        else:
+            market_value_total = get_account_market_value(holdings)
 
+        account_value = round(account.balance + market_value_total, 2)
         new_total = DailyTotals(
             account_number=account.id, date=date, value=account_value
         )
         db.session.add(new_total)
 
     db.session.commit()
-
-
-def daily_totals():
-    while True:
-        today = str(date.today())
-        current_hour = int(datetime.now().astimezone(pytz.utc).strftime("%H"))
-        us_market_closing_hour_utc = 21  # 4PM EST
-        sleeping_seconds = 3600
-
-        if current_hour < us_market_closing_hour_utc:
-            sleeping_seconds = (us_market_closing_hour_utc - current_hour) * 3600
-            message = f"Waiting {sleeping_seconds/3600} hours to check again."
-        elif check_daily_total_logged(today) is False:
-            message = f"Assigning account totals, next check in {sleeping_seconds/3600} hours."
-            set_account_totals(today)
-        else:
-            message = f"Totals have already been assigned today. Next check in {sleeping_seconds/3600} hours."
-
-        print(
-            f"Server status check. Date: {today}, Hour: {current_hour}/24 (UTC). {message}"
-        )
-        time.sleep(sleeping_seconds)
