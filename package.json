@@ -4,6 +4,6 @@
 	"main": "",
 	"scripts": {
 		"heroku-prebuild": "cd client && npm install && npm run build",
-		"heroku-postbuild": "cd client && npm install && npm run build"
+		"heroku-postbuild": ""
 	}
 }

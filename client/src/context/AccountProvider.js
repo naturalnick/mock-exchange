@@ -45,11 +45,12 @@ function AccountProvider({ children }) {
 		const holdingSymbols = holdings.map((holding) => holding.symbol);
 
 		const stockData = await getStockData(holdingSymbols);
+
 		for (let h = 0; h < holdings.length; h++) {
 			for (let i = 0; i < stockData.length; i++) {
-				if (holdings[i].symbol === stockData[h].symbol) {
-					holdings[i].marketValue = stockData[h].latestPrice;
-					holdings[i].companyName = stockData[h].companyName;
+				if (holdings[h].symbol === stockData[i].symbol) {
+					holdings[h].marketValue = stockData[i].latestPrice;
+					holdings[h].companyName = stockData[i].companyName;
 				}
 			}
 		}
