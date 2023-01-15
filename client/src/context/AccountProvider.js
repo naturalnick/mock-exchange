@@ -37,26 +37,28 @@ function AccountProvider({ children }) {
 		if (holdings.length === 0) {
 			setHoldings([]);
 			setIsAccountLoading(false);
-			return;
-		}
-		if ("error" in holdings) {
-			if (holdings.error === "invalid token") handleLogout();
-		}
-		const holdingSymbols = holdings.map((holding) => holding.symbol);
+		} else {
+			if ("error" in holdings) {
+				if (holdings.error === "invalid token") handleLogout();
+			}
+			const holdingSymbols = holdings.map((holding) => holding.symbol);
 
-		const stockData = await getStockData(holdingSymbols);
-
-		for (let h = 0; h < holdings.length; h++) {
-			for (let i = 0; i < stockData.length; i++) {
-				if (holdings[h].symbol === stockData[i].symbol) {
-					holdings[h].marketValue = stockData[i].latestPrice;
-					holdings[h].companyName = stockData[i].companyName;
+			const stockData = await getStockData(holdingSymbols);
+			console.log(stockData);
+			for (let h = 0; h < holdings.length; h++) {
+				for (let i = 0; i < stockData.length; i++) {
+					if (holdings[h].symbol === stockData[i].symbol) {
+						holdings[h].marketValue = stockData[i].latestPrice;
+						console.log(stockData[i]);
+						holdings[h].companyName = stockData[i].companyName;
+						console.log(stockData[i].companyName);
+					}
 				}
 			}
-		}
 
-		setHoldings(holdings);
-		setIsAccountLoading(false);
+			setHoldings(holdings);
+			setIsAccountLoading(false);
+		}
 	}, [handleLogout]);
 
 	useEffect(() => {
