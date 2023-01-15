@@ -48,8 +48,6 @@ def get_stock_data(symbols):
                     "previousClose": None,
                 }
             )
-            print("API")
-            print(stock_data)
     return stock_data
 
 
