@@ -28,7 +28,6 @@ function AccountProvider({ children }) {
 		setAccountNumber(Number(account.account_number));
 		setCashBalance(Number(account.balance));
 		if (account.watch_list.length > 0) {
-			console.log(account.watch_list);
 			updateWatchlist(account.watch_list.split(","));
 		} else setWatchlist([]);
 	}, [handleLogout]);
@@ -65,7 +64,6 @@ function AccountProvider({ children }) {
 	}, [updateAccountInfo, updateAccountHoldings]);
 
 	async function updateWatchlist(commaSeparatedSymbols) {
-		console.log(commaSeparatedSymbols);
 		const stockData = await getStockData(commaSeparatedSymbols);
 		if ("error" in stockData) setWatchlist([]);
 		else setWatchlist(stockData);

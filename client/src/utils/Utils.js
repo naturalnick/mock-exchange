@@ -1,5 +1,10 @@
+const dollar = new Intl.NumberFormat("en-US", {
+	style: "currency",
+	currency: "USD",
+});
+
 export function formatPrice(num) {
-	return "$" + Number(num).toFixed(2);
+	return dollar.format(Number(num));
 }
 
 export function formatDecoratedPrice(num) {
@@ -16,9 +21,11 @@ export function formatDecoratedPrice(num) {
 		prefix = "-";
 		newNum = newNum.slice(1);
 	}
+	newNum = dollar.format(newNum);
 	return (
 		<span style={priceStyle}>
-			{prefix}${newNum}
+			{prefix}
+			{newNum}
 		</span>
 	);
 }
