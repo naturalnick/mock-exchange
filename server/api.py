@@ -4,21 +4,25 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# FINNHUB for stock quotes
 FINNHUB_TOKEN = os.getenv("FINNHUB_TOKEN")
-FMP_TOKEN = os.getenv("FMP_TOKEN")
-TWELVE_TOKEN = os.getenv("TWELVE_TOKEN")
 
-# FINNHUB STOCK DATA
+# FMP for stock searching
+FMP_TOKEN = os.getenv("FMP_TOKEN")
+
+
 def get_stock_data(symbols):
     stock_data = []
     for symbol in symbols:
         try:
+            finnhub_url = "https://finnhub.io/api/v1"
+
             res1 = requests.get(
-                f"https://finnhub.io/api/v1/quote?symbol=AAPL&token={FINNHUB_TOKEN}"
+                f"{finnhub_url}/quote?symbol={symbol}&token={FINNHUB_TOKEN}"
             )
             stock = res1.json()
             res2 = requests.get(
-                f"https://finnhub.io/api/v1/stock/profile2?symbol={symbol}&token={FINNHUB_TOKEN}"
+                f"{finnhub_url}/stock/profile2?symbol={symbol}&token={FINNHUB_TOKEN}"
             )
             company_name = res2.json()["name"]
             stock_data.append(
@@ -51,59 +55,19 @@ def get_stock_data(symbols):
     return stock_data
 
 
-# # TWELVE STOCK DATA
-# def get_stock_data2(symbols):
-
-#     try:
-#         res1 = requests.get(
-#             f"https://api.twelvedata.com/quote?symbol={symbols}&apikey={TWELVE_TOKEN}"
-#         )
-#         res2 = requests.get(
-#             f"https://api.twelvedata.com/price?symbol={symbols}&apikey={TWELVE_TOKEN}"
-#         )
-
-#         isBatch = "," in symbols
-
-#         if isBatch:
-#             stocks = list(res1.json().values())
-
-#             prices = [
-#                 {"symbol": key, "price": value["price"]}
-#                 for key, value in res2.json().items()
-#             ]
-
-#             for stock in stocks:
-#                 for price in prices:
-#                     if stock["symbol"] == price["symbol"]:
-#                         stock["price"] = price["price"]
-#         else:
-#             stocks = res1.json()
-#             price = res2.json()
-#             stocks["price"] = price["price"]
-#             stocks = [stocks]
-#         return [
-#             {
-#                 "symbol": stock["symbol"],
-#                 "companyName": stock["name"],
-#                 "latestPrice": stock["price"],
-#                 "change": stock["change"],
-#                 "changePercent": stock["percent_change"],
-#                 "high": stock["high"],
-#                 "low": stock["low"],
-#                 "open": stock["open"],
-#                 "previousClose": stock["close"],
-#             }
-#             for stock in stocks
-#         ]
-#     except:
-#         return None
-
-
-def search_stocks(text):
+def search_stocks(query):
     try:
-        res1 = requests.get(
-            f"https://financialmodelingprep.com/api/v3/search?query={text}&limit=10&exchange=NASDAQ,NYSE&apikey={FMP_TOKEN}"
-        )
-        return res1.json()
+        fmp_url = "https://financialmodelingprep.com/api/v3"
+        exchanges = "NASDAQ,NYSE"
+        max_results = "10"
+        search_url = f"{fmp_url}/search?query={query}&limit={max_results}&exchange={exchanges}&apikey={FMP_TOKEN}"
+        response = requests.get(search_url)
+        results = response.json()
+
+        for x in range(0, len(results)):
+            if results[x]["symbol"] == query.upper():
+                results.insert(0, results.pop(x))
+
+        return results
     except:
         return None
