@@ -29,8 +29,8 @@ function TradeQuantityInput({
 						setValues((prevValues) => ({
 							...prevValues,
 							quantity: shareHolding,
+							action: "sell",
 						}));
-						handleChange("action")("sell");
 					}}
 				>
 					Sell All

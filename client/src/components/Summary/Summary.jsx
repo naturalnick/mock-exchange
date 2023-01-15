@@ -96,12 +96,13 @@ export default function Summary() {
 								<Placeholder bg="dark" xs={6} animation="glow" />
 							) : (
 								<>
-									{formatDecoratedPrice(gainsLosses)}{" "}
+									{formatDecoratedPrice(gainsLosses)} (
 									{formatPercentage(
 										gainsLosses < 0
 											? -gainLossPercent
 											: gainLossPercent
 									)}
+									)
 								</>
 							)}
 						</td>

@@ -87,6 +87,7 @@ export async function getDailyTotals() {
 
 export async function toggleWatched(symbol) {
 	const token = getTokenFromCookie();
+
 	const response = await axios
 		.post(
 			"/api/account/watchlist",
@@ -118,7 +119,6 @@ export async function searchStocks(query) {
 	const response = await axios
 		.get(`/api/stock/search?query=${query}`)
 		.catch((error) => {
-			console.log(setErrorMessage(error));
 			return setErrorMessage(error);
 		});
 	return response.status === 200 ? response.data : response;

@@ -46,7 +46,7 @@ export default function Stock({
 	})} ${today.toLocaleDateString()}`;
 
 	async function handleWatchlist() {
-		await toggleWatched(symbol, !isWatched);
+		await toggleWatched(symbol);
 		updateAccountInfo();
 	}
 

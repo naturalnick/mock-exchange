@@ -17,12 +17,9 @@ import TradeModalButtons from "./TradeModalButtons";
 const schema = yup.object().shape({
 	action: yup.string().required("Action is required."),
 	quantity: yup
-		.number("Value must be a number.")
+		.number("Quantity must be a number.")
 		.integer("Quantity must be a whole number.")
-		.test("positive", "Quantity must be greater than 0.", (value) => {
-			console.log(value);
-			return value > 0;
-		})
+		.positive("Quantity must be a positive number.")
 		.required("Quantity is required."),
 });
 
