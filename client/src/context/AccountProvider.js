@@ -34,7 +34,7 @@ function AccountProvider({ children }) {
 
 	const updateAccountHoldings = useCallback(async () => {
 		const holdingsData = await getHoldings();
-		console.log(holdingsData);
+
 		if (holdingsData.length === 0) {
 			setHoldings([]);
 			setIsAccountLoading(false);
@@ -45,7 +45,7 @@ function AccountProvider({ children }) {
 			const holdingSymbols = holdingsData.map((holding) => holding.symbol);
 
 			const stockData = await getStockData(holdingSymbols);
-			console.log(stockData);
+
 			for (let h = 0; h < holdingsData.length; h++) {
 				for (let i = 0; i < stockData.length; i++) {
 					if (holdingsData[h].symbol === stockData[i].symbol) {
