@@ -16,7 +16,10 @@ def daily_totals():
         current_hour = int(datetime.now().astimezone(pytz.utc).strftime("%H"))
         us_market_closing_hour_utc = 21  # 4PM EST
         print(f"Server status check. Date: {today}, Hour: {current_hour}/24 (UTC).")
-        if check_daily_total_logged(today) is False:
+        if (
+            check_daily_total_logged(today) is False
+            and current_hour > us_market_closing_hour_utc
+        ):
             print("Assigning account totals.")
             set_account_totals(today)
 
@@ -52,4 +55,4 @@ app = create_app()
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5001)
+    app.run(port=5001)
