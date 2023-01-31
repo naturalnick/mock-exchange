@@ -31,7 +31,7 @@ export function formatDecoratedPrice(num) {
 }
 
 export function formatPercentage(num) {
-	let newNum = Number(num).toFixed(2);
+	let newNum = Number(num).toFixed(1);
 
 	let percentStyle = { color: "black" };
 	let prefix = "";
@@ -50,6 +50,10 @@ export function formatPercentage(num) {
 			{newNum}%
 		</span>
 	);
+}
+
+export function calculatePercentage(newValue, prevValue) {
+	return ((newValue - prevValue) / prevValue) * 100;
 }
 
 export function formatDate(date) {

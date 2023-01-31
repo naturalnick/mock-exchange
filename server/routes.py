@@ -68,7 +68,7 @@ def get_stock():
 
 
 @blueprint.route("/api/stock/search", methods=["GET"])
-def get_stocks():
+def search_stocks():
     query = request.args.get("query")
     stocks = api.search_stocks(query)
     if stocks is not None:

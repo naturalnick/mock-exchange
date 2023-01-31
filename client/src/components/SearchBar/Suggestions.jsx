@@ -12,7 +12,7 @@ export default function Suggestions({
 			className="suggestion"
 			onClick={() => handleClick(data.symbol)}
 		>
-			{data.symbol} - {data.name} - {data.exchangeShortName}
+			{data.symbol} - {data.name}
 			<Button
 				variant="primary"
 				size="sm"
