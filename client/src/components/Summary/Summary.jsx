@@ -5,6 +5,7 @@ import { useAccount } from "../../context/AccountProvider";
 import "./Summary.css";
 import Charts from "../Charts/Charts";
 import {
+	calculatePercentage,
 	formatDecoratedPrice,
 	formatPercentage,
 	formatPrice,
@@ -18,7 +19,10 @@ export default function Summary() {
 
 	const gainsLosses = Number(marketValue) - Number(baseCost);
 	const gainLossPercent =
-		gainsLosses !== 0 ? Number(marketValue) / Number(baseCost) / 100 : 0;
+		gainsLosses !== 0
+			? calculatePercentage(Number(marketValue), Number(baseCost))
+			: 0;
+	console.log(gainLossPercent);
 	const accountValue = Number(marketValue) + Number(cashBalance);
 
 	const getTotalMarketValue = useCallback(() => {

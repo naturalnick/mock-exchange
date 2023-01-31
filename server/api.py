@@ -9,6 +9,7 @@ FINNHUB_TOKEN = os.getenv("FINNHUB_TOKEN")
 
 # FMP for stock searching
 FMP_TOKEN = os.getenv("FMP_TOKEN")
+ALPHA_VANTAGE_TOKEN = os.getenv("ALPHA_VANTAGE_TOKEN")
 
 
 def get_stock_data(symbols):
@@ -57,16 +58,15 @@ def get_stock_data(symbols):
 
 def search_stocks(query):
     try:
-        fmp_url = "https://financialmodelingprep.com/api/v3"
-        exchanges = "NASDAQ,NYSE"
-        max_results = "10"
-        search_url = f"{fmp_url}/search?query={query}&limit={max_results}&exchange={exchanges}&apikey={FMP_TOKEN}"
-        response = requests.get(search_url)
-        results = response.json()
-
-        for x in range(0, len(results)):
-            if results[x]["symbol"] == query.upper():
-                results.insert(0, results.pop(x))
+        url = f"https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords={query}&apikey={ALPHA_VANTAGE_TOKEN}"
+        response = requests.get(url)
+        data = response.json()
+        bestMatches = data["bestMatches"]
+        results = [
+            {"symbol": stock["1. symbol"], "name": stock["2. name"]}
+            for stock in bestMatches
+            if stock["4. region"] == "United States"
+        ]
 
         return results
     except:

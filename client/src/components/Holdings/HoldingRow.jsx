@@ -1,4 +1,5 @@
 import {
+	calculatePercentage,
 	formatDecoratedPrice,
 	formatPercentage,
 	formatPrice,
@@ -17,7 +18,7 @@ export default function HoldingRow({
 	const gainLoss = Number(marketValueTotal) - Number(baseCostTotal);
 	const gainLossPercent =
 		gainLoss !== 0
-			? Number(marketValueTotal) / Number(baseCostTotal) / 100
+			? calculatePercentage(Number(marketValueTotal), Number(baseCostTotal))
 			: 0;
 	return (
 		<tr>
