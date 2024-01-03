@@ -7,8 +7,7 @@ load_dotenv()
 # FINNHUB for stock quotes
 FINNHUB_TOKEN = os.getenv("FINNHUB_TOKEN")
 
-# FMP for stock searching
-FMP_TOKEN = os.getenv("FMP_TOKEN")
+# ALPHAVANTAGE for stock searching
 ALPHA_VANTAGE_TOKEN = os.getenv("ALPHA_VANTAGE_TOKEN")
 
 
