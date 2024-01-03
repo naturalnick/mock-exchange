@@ -22,7 +22,7 @@ export default function Summary() {
 		gainsLosses !== 0
 			? calculatePercentage(Number(marketValue), Number(baseCost))
 			: 0;
-	console.log(gainLossPercent);
+
 	const accountValue = Number(marketValue) + Number(cashBalance);
 
 	const getTotalMarketValue = useCallback(() => {
